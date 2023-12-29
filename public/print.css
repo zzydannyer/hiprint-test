@@ -1,0 +1,13 @@
+@page {
+  size: A4 portrait;
+}
+@media print {
+  /* 你所有打印的样式都放在这里 */
+  #header,
+  #footer,
+  #nav {
+    display: none !important;
+  }
+  body {
+  }
+}

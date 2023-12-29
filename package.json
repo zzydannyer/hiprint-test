@@ -7,6 +7,11 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "element-ui": "^2.15.14",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.10.1",
+    "jspdf": "^2.5.1",
+    "print-js": "^1.6.0",
     "vue": "^2.6.14",
     "vue-plugin-hiprint": "^0.0.56"
   },

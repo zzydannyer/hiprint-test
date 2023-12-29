@@ -74,7 +74,7 @@
         </li>
       </ul>
     </div>
-    <PrintDesign />
+    <!-- <PrintDesign /> -->
   </main>
 </template>
 
