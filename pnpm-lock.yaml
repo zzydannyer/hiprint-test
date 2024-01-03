@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@hufe921/canvas-editor':
+    specifier: ^0.9.61
+    version: 0.9.61
   element-ui:
     specifier: ^2.15.14
     version: 2.15.14(vue@2.7.15)
@@ -136,6 +139,11 @@ packages:
     dependencies:
       '@hapi/hoek': 9.3.0
     dev: true
+
+  /@hufe921/canvas-editor@0.9.61:
+    resolution: {integrity: sha512-nDPfM3XMKfGLh0B7MckAmMkrTLEv2Y3qBCVNHrgFc803QPmh6wosjQx8D9gIlwNzDgzCzz1vaqOuLi8gOikOhg==}
+    engines: {node: '>=12.0.0'}
+    dev: false
 
   /@jridgewell/gen-mapping@0.3.3:
     resolution: {integrity: sha512-HLhSWOLRi875zjjMG/r+Nv0oCW8umGb0BgEhyX3dDX3egwZtB8PqLnjz3yedt8R5StBrzcg4aBpnh8UA9D1BoQ==}

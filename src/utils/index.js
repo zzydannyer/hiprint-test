@@ -4,7 +4,8 @@ function myStyle(mode) {
   mode = mode === "landscape" ? mode : "portrait";
   const style = document.createElement("style");
   style.type = "text/css";
-  style.innerHTML = `@page { size: ${mode}; margin: 10mm;}`;
+  // style.innerHTML = `@page { size: ${mode}; margin: 20mm;}`;
+  style.innerHTML = `@page { size: A4; margin: 20mm;}`;
   return style;
 }
 
@@ -48,8 +49,18 @@ export const printPartial = (
   const iframeWin = iframeDom.contentWindow;
 
   iframeDom.onload = () => {
+    console.log(
+      "🚀 ~ file: index.js:51 ~ iframeDom:",
+      iframeDom.focus,
+      iframeWin.print
+    );
     iframeWin.focus();
     iframeWin.print();
-    document.body.removeChild(iframeDom);
+    // 设置一个延时
+    setTimeout(() => {
+      // 假设用户已经关闭了打印对话框
+      // 在这里执行您想要的操作，比如移除 iframe
+      document.body.removeChild(iframeDom);
+    }, 500); // 延时时间可以根据需要调整
   };
 };

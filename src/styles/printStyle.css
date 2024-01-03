@@ -1,0 +1,142 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.print-container {
+  /* width: 210mm; */
+  width: 794px;
+  /* height: 297mm; */
+  height: auto;
+  padding: 10mm;
+  box-sizing: border-box;
+  border: 1px solid blue;
+}
+
+@media print {
+  #print-container {
+  }
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  .form-header {
+    width: 100%;
+    background-color: white; /* 确保背景不透明 */
+  }
+  * {
+    page-break-before: auto;
+    page-break-inside: auto;
+    page-break-after: auto;
+    break-before: auto;
+    break-inside: auto;
+    break-after: auto;
+  }
+
+  .form-template {
+    page-break-before: always;
+  }
+  .print-container {
+    /* width: 210mm; */
+    /* height: 297mm; */
+    width: 794px;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    page-break-after: always;
+    box-sizing: border-box;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 20mm;
+}
+
+/* left 偶数 right 奇数 */
+/* @page :left 
+  @page :right  */
+
+.text {
+  font-size: 24px;
+  font-weight: bold;
+  color: red;
+}
+
+.textarea {
+  width: 100%;
+  /* font-family: "Microsoft YaHei"; */
+  font-size: 16px;
+  white-space: pre-wrap;
+}
+.print-dialog .print-container .form-template:not(:first-child) {
+  margin-top: 100px;
+}
+.form-header {
+  color: #323232;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 500;
+  padding: 10px 0;
+  background: #f9f9f9;
+  margin-bottom: 10mm;
+}
+@keyframes window-open {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale3d(0, 0, 1);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: scale3d(1, 1, 1);
+  }
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  overflow: auto;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+
+.modal-content {
+  background: #fefefe;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: calc(210mm + 4px);
+  /* height: 20%; */
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: window-open 0.2s 1;
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+//关闭特效
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}

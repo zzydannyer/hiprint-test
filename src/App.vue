@@ -1,15 +1,13 @@
 <template>
   <div id="app">
+    <span class="text">text</span>
     <!-- :style="{
       width: `${page.width + 2}px`,
       minHeight: `${page.height + 2}px`,
     }" -->
     <div style="text-align: center">
-      <el-button type="primary" size="mini" @click="printByPrintJS">
-        PrintJS
-      </el-button>
-      <el-button type="primary" size="mini" @click="printByhtml2canvasAndjsPdf">
-        html2canvas->jsPdf
+      <el-button type="primary" size="mini" @click="handleOpen">
+        编辑打印
       </el-button>
       <el-button type="primary" size="mini" @click="printByhtml2pdf">
         html2pdf
@@ -20,33 +18,40 @@
       <el-button type="primary" size="mini" @click="printByPrintThis">
         printThis
       </el-button>
-      <el-button type="primary" size="mini" @click="printByPrintPartial">
-        printPartial
-      </el-button>
+
       <div id="editor" style="display: none">
         <input type="number" id="fontSizeInput" value="16" min="10" max="36" />
         pt
         <button id="applyFontSize">应用字体大小</button>
       </div>
     </div>
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <DragTable />
-    <FormTable />
+    <!-- <img alt="Vue logo" src="./assets/logo.png" /> -->
+    <!-- <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="handleClose"> &times; </span>
+        <div> -->
+    <ToolBar />
+    <PrintContainer :data="templateData.templatex" />
+    <!-- </div> -->
+    <!-- </div>
+    </div> -->
     <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
+    <!-- <CanvasEditor /> -->
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
-import DragTable from "@/components/DragTable";
-import FormTable from "@/components/FormTable";
-import printJS from "print-js";
-import html2canvas from "html2canvas";
-import jsPdf from "jspdf";
+import HelloWorld from "@/components/HelloWorld.vue";
+import ToolBar from "@/components/ToolBar.vue";
+import PrintContainer from "@/components/PrintContainer.vue";
+
 import html2pdf from "html2pdf.js";
 import { hiprint, defaultElementTypeProvider } from "vue-plugin-hiprint";
-import { printPartial } from "./utils";
+
 import "../public/printThis.js";
+import templateData from "./data";
+
+import CanvasEditor from "./components/CanvasEditor.vue";
 
 // 计算分辨率
 const arrDPI = [];
@@ -107,8 +112,9 @@ export default {
   name: "App",
   components: {
     HelloWorld,
-    DragTable,
-    FormTable,
+    ToolBar,
+    PrintContainer,
+    CanvasEditor,
   },
   beforeCreate() {
     hiprint.init({
@@ -124,6 +130,7 @@ export default {
       hiprintTemplate: null,
       previewVisible: false,
       mode: "Portrait", // 打印横竖方向，竖portrait，横Landscape
+      templateData,
     };
   },
   computed: {
@@ -143,28 +150,15 @@ export default {
     },
   },
   methods: {
-    printByPrintJS() {
-      printJS({
-        printable: "app",
-        type: "html",
-        header: "PrintJS - Print HTML Elements",
-      });
+    handleOpen() {
+      const modal = document.getElementById("myModal");
+      modal.style.display = "block";
     },
-    printByhtml2canvasAndjsPdf() {
-      const element = document.getElementById("app");
-      html2canvas(element, {
-        onclone: (document) => {
-          // document.getElementById("print-button").style.visibility = "hidden";
-        },
-      })
-        .then((canvas) => {
-          const img = canvas.toDataURL("image/png");
-          const pdf = new jsPdf();
-          pdf.addImage(img, "JPEG", 0, 0, 842, 595);
-          pdf.save("test.pdf");
-        })
-        .catch(console.error);
+    handleClose() {
+      const modal = document.getElementById("myModal");
+      modal.style.display = "none";
     },
+
     printByhtml2pdf() {
       const element = document.getElementById("app");
       const opt = {
@@ -178,7 +172,14 @@ export default {
           orientation: "portrait",
         },
       };
-      html2pdf().set(opt).from(element).save();
+      // html2pdf().set(opt).from(element).save();
+      const pdfData = html2pdf().set(opt).from(element);
+      const pdfBlob = new Blob([pdfData], { type: "application/pdf" });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const printWindow = window.open(pdfUrl);
+      printWindow.print();
+      printWindow.close();
+      URL.revokeObjectURL(pdfUrl);
     },
     printByHiprint() {
       const element = document.getElementById("app");
@@ -187,18 +188,12 @@ export default {
     printByPrintThis() {
       $("#app").printThis();
     },
-    printByPrintPartial() {
-      const element = document.getElementById("app");
-      printPartial(element, {
-        title: "test",
-        mode: this.mode,
-      });
-    },
   },
 };
 </script>
 
 <style>
+@import "@/styles/printStyle.css";
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
