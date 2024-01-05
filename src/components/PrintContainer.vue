@@ -2,9 +2,12 @@
   <!-- <el-dialog> -->
   <section class="print-dialog">
     <!-- <div class="print-container-bg" > -->
-    <div style="width: 794px" id="print-container">
-      <!-- <Template1 :data="tData" v-for="tData in data" :key="tData.uid" /> -->
-      <CanvasTemplate2 :data="data" />
+    <div
+      style="width: 210mm; padding: 20mm; box-sizing: border-box"
+      id="print-container"
+    >
+      <Template1 :data="tData" v-for="tData in data" :key="tData.uid" />
+      <!-- <CanvasTemplate2 :data="data" /> -->
       <!-- <div
         style="
           border: 1px dashed red;

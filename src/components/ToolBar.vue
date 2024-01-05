@@ -15,6 +15,9 @@
     <el-button type="primary" size="mini" @click="printPage">
       printPage
     </el-button>
+    <el-button type="primary" size="mini" @click="printByhtml2pdf">
+      html2pdf
+    </el-button>
   </div>
 </template>
 
@@ -23,6 +26,7 @@ import { printPartial } from "../utils";
 import printJS from "print-js";
 import html2canvas from "html2canvas";
 import jsPdf from "jspdf";
+import html2pdf from "html2pdf.js";
 
 export default {
   name: "ToolBar",
@@ -44,15 +48,18 @@ export default {
     printByhtml2canvas() {
       const option = {
         width: 794,
+        x: 0,
+        // y: 1123,
         useCORS: true,
       };
-      const element = document.getElementById("app");
+      const element = document.getElementById("print-container");
       html2canvas(element, option).then((canvas) => {
-        document.body.appendChild(canvas);
+        // document.body.appendChild(canvas);
         const url = canvas.toDataURL("image/jpg");
         const img = document.createElement("img");
         img.src = url;
         img.width = 794;
+        img.style.border = "1px solid red";
         img.onload = () => {
           document.body.appendChild(img);
         };
@@ -68,7 +75,7 @@ export default {
         .then((canvas) => {
           const img = canvas.toDataURL("image/png");
           const pdf = new jsPdf();
-          pdf.addImage(img, "JPEG", 0, 0, 842, 595);
+          pdf.addImage(img, "JPEG", 0, 0, 794, 1123);
           const pdfBlob = new Blob([pdf], { type: "application/pdf" });
           const pdfUrl = URL.createObjectURL(pdfBlob);
           const printWindow = window.open(pdfUrl);
@@ -78,6 +85,11 @@ export default {
           // pdf.save("test.pdf");
         })
         .catch(console.error);
+    },
+    printByhtml2pdf() {
+      const element = document.getElementById("print-container");
+      const opt = {};
+      html2pdf().set(opt).from(element).save();
     },
     printPage() {
       let iframe = document.getElementById("print-iframe");

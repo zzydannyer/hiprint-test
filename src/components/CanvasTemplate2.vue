@@ -48,14 +48,15 @@ export default {
       lastY: 0,
       boxW: 100,
       boxH: 50,
+      lineHeight: 20,
     };
   },
   mounted() {
     this.init();
-    this.$refs.canvas.addEventListener("click", this.eventHandler);
+    // this.$refs.canvas.addEventListener("click", this.eventHandler);
   },
   beforeUnmount() {
-    this.$refs.canvas.removeEventListener("click", this.eventHandler);
+    // this.$refs.canvas.removeEventListener("click", this.eventHandler);
   },
   methods: {
     init() {
