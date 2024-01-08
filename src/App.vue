@@ -4,6 +4,15 @@
       width: `${page.width + 2}px`,
       minHeight: `${page.height + 2}px`,
     }" -->
+
+    <!-- <img alt="Vue logo" src="./assets/logo.png" /> -->
+    <!-- <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="handleClose"> &times; </span>
+        <div> -->
+
+    <PrintContainer :data="templateData.template1" />
+    <ToolBar />
     <div style="text-align: center">
       <el-button type="primary" size="mini" @click="handleOpen">
         编辑打印
@@ -22,13 +31,6 @@
         <button id="applyFontSize">应用字体大小</button>
       </div>
     </div>
-    <!-- <img alt="Vue logo" src="./assets/logo.png" /> -->
-    <!-- <div id="myModal" class="modal">
-      <div class="modal-content">
-        <span class="close" @click="handleClose"> &times; </span>
-        <div> -->
-    <ToolBar />
-    <PrintContainer :data="templateData.template1" />
     <!-- </div>
       </div>
     </div> -->
@@ -187,6 +189,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

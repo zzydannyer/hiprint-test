@@ -64,3 +64,12 @@ export const printPartial = (
     }, 500); // 延时时间可以根据需要调整
   };
 };
+
+export function mmToPx(mm, ppi) {
+  // 1英寸等于25.4毫米
+  const inches = mm / 25.4;
+  // 将英寸转换为像素
+  const pixels = inches * ppi;
+  // 四舍五入到最近的整数
+  return Math.round(pixels);
+}

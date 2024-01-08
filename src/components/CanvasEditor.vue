@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="canvas-editor" style="border: 1px solid gray"></div>
+    <div class="canvas-editor"></div>
   </div>
 </template>
 
