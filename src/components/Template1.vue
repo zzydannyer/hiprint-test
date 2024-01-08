@@ -45,6 +45,7 @@
           <!-- 表格内容 -->
         </tbody>
       </table>
+      <div class="dashed-line"></div>
     </div>
   </section>
 </template>
