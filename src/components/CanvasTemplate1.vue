@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { SIZE } from "./constants";
+import { SIZE } from "@/utils/constants";
 export default {
   name: "CanvasTemplate1",
   data() {

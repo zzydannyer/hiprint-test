@@ -90,11 +90,8 @@ export default {
       const element = document.getElementById("print-container");
       const opt = {
         html2canvas: {
-          ignoreElements: (element) => {
-            console.log("element", element);
-            return true;
-            // return element.id === "print-button";
-          },
+          // allowTaint: true,
+          useCORS: true,
         },
       };
       html2pdf().set(opt).from(element).save();
