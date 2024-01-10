@@ -113,10 +113,6 @@ export default {
     //   providers: [new defaultElementTypeProvider()],
     // });
   },
-  mounted() {
-    console.log("PPI", this.getPPI());
-    // this.hiprintTemplate = new hiprint.PrintTemplate();
-  },
   data() {
     return {
       // hiprintTemplate: null,

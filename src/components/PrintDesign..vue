@@ -48,7 +48,6 @@ export default {
     });
   },
   mounted() {
-    console.log($(".header"));
     this.init();
   },
   methods: {
@@ -91,7 +90,6 @@ export default {
       let printData = [6666];
       let jqObj = this.hiprintTemplate.getHtml(printData);
       $("#preview-container").html(jqObj);
-      console.log("🚀 jqObj", jqObj);
     },
     print() {
       let printData = [{}, {}];
@@ -103,10 +101,10 @@ export default {
         printer: "Microsoft Print to PDF",
       });
       this.hiprintTemplate.on("printSuccess", () => {
-        console.log("printSuccess");
+        // console.log("printSuccess");
       });
       this.hiprintTemplate.on("printError", () => {
-        console.log("printError");
+        // console.log("printError");
       });
     },
     exportJson() {

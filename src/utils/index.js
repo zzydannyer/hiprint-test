@@ -49,11 +49,6 @@ export const printPartial = (
   const iframeWin = iframeDom.contentWindow;
 
   iframeDom.onload = () => {
-    console.log(
-      "🚀 ~ file: index.js:51 ~ iframeDom:",
-      iframeDom.focus,
-      iframeWin.print
-    );
     iframeWin.focus();
     iframeWin.print();
     // 设置一个延时

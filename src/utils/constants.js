@@ -24,3 +24,47 @@ export const TEMP_ENUM = {
   18: "民主生活会",
   19: "党员民主评议管理",
 };
+
+export const TEMPLATES = {
+  1: (data) => ({
+    theader: null,
+    tbody: [
+      [
+        { key: "label", content: "支部名称", width: 64, editable: false },
+        { key: "orgName", content: data.orgName, editable: true },
+      ],
+      [
+        {
+          title: "支部介绍：",
+          key: "introduce",
+          content: data.introduce,
+          colspan: 2,
+          editable: true,
+        },
+      ],
+      [
+        {
+          title: "照片：",
+          key: "imgUrl",
+          img: data.imgUrl,
+          colspan: 2,
+          editable: false,
+        },
+      ],
+    ],
+  }),
+  2: (data) => ({
+    theader: [
+      { content: "姓名", width: 32 },
+      { content: "岗位职务", width: 64 },
+      { content: "入党时间", width: 32 },
+      { content: "分工内容", width: 64 },
+    ],
+    tbody: data.map((item) => [
+      { content: item.name, editable: true },
+      { content: item.position, editable: true },
+      { content: item.joinTime, editable: true },
+      { content: item.work, editable: true },
+    ]),
+  }),
+};
