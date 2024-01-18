@@ -1,9 +1,18 @@
 <template>
   <!-- <el-dialog> -->
-  <section class="print-dialog">
+  <section class="print-dialog" style="width: 794px; min-height: 1123px">
     <!-- <div class="print-container-bg" > -->
-    <div style="width: 794px; box-sizing: border-box" id="print-container">
-      <Template1 :data="tData" v-for="tData in data" :key="tData.uid" />
+    <div
+      style="width: 794px; min-height: 1123px; box-sizing: border-box"
+      id="print-container"
+    >
+      <template v-if="true">
+        <Template1
+          v-for="tData in data.template1"
+          :key="tData.uid"
+          :data="tData"
+        />
+      </template>
       <!-- <CanvasTemplate2 :data="data" /> -->
       <!-- <div
         style="
@@ -32,7 +41,7 @@ export default {
   name: "PrintContainer",
   props: {
     data: {
-      type: Array | Object,
+      type: Object,
       default: () => null,
     },
   },

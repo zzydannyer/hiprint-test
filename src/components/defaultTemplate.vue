@@ -1,6 +1,6 @@
 <!-- 支部情况 -->
 <template>
-  <section class="form-section" :id="containerId" />
+  <section class="form-section" :id="containerId" v-if="data?.uid" />
 </template>
 
 <script>
@@ -8,11 +8,15 @@ import PrintCore from "@/utils/core";
 import { Loading } from "element-ui";
 
 export default {
-  name: "Template1",
+  name: "defaultTemplate",
   props: {
     data: {
-      type: Array | Object,
+      type: Object,
       default: () => null,
+    },
+    tempIndex: {
+      type: Number,
+      require: true,
     },
   },
   inject: ["PPI"],
@@ -23,7 +27,7 @@ export default {
       footerHeight: 80,
       leftPadding: 80,
       rightPadding: 80,
-      tempIndex: 1,
+      // tempIndex: 1,
       inputTimeout: null,
       loadingOptions: {
         lock: true,
@@ -60,12 +64,12 @@ export default {
   methods: {
     init(data) {
       this.printCore = new PrintCore(
-        data.uid,
+        data,
         this.tempIndex,
         `${this.headerHeight}px ${this.rightPadding}px ${this.footerHeight}px ${this.leftPadding}px`
       );
       const loadingInstance = Loading.service(this.loadingOptions);
-      this.printCore.render(data).then(() => {
+      this.printCore.render().then(() => {
         loadingInstance.close();
       });
     },

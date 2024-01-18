@@ -10,11 +10,11 @@
       <div class="modal-content">
         <span class="close" @click="handleClose"> &times; </span>
         <div> -->
-
-    <PrintContainer :data="templateData.template1" />
+    <!-- <CanvasEditor /> -->
+    <PrintContainer v-loading="loading" :data="templateData" />
     <ToolBar />
     <div style="text-align: center">
-      <el-button type="primary" size="mini" @click="handleOpen">
+      <!-- <el-button type="primary" size="mini" @click="handleOpen">
         编辑打印
       </el-button>
 
@@ -23,13 +23,13 @@
       </el-button>
       <el-button type="primary" size="mini" @click="printByPrintThis">
         printThis
-      </el-button>
+      </el-button> -->
 
-      <div id="editor" style="display: none">
+      <!-- <div id="editor" style="display: none">
         <input type="number" id="fontSizeInput" value="16" min="10" max="36" />
         pt
         <button id="applyFontSize">应用字体大小</button>
-      </div>
+      </div> -->
     </div>
     <!-- </div>
       </div>
@@ -119,7 +119,8 @@ export default {
       PPI: this.getPPI(),
       previewVisible: false,
       mode: "Portrait", // 打印横竖方向，竖portrait，横Landscape
-      templateData,
+      templateData: {},
+      loading: false,
     };
   },
   computed: {
@@ -137,6 +138,9 @@ export default {
       // 边距为10mm
       // return (1 / 25.4) * 10 * DPI;
     },
+  },
+  created() {
+    this.getData();
   },
   methods: {
     getPPI() {
@@ -156,7 +160,13 @@ export default {
       // document.body.removeChild(div);
       // return ppi;
     },
-
+    getData() {
+      this.loading = true;
+      setTimeout(() => {
+        this.templateData = templateData;
+        this.loading = false;
+      }, 1500);
+    },
     handleOpen() {
       const modal = document.getElementById("myModal");
       modal.style.display = "block";

@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div style="position: fixed; left: 0; top: 0">
     <el-button type="primary" size="mini" @click="printByPrintPartial">
       printPartial
     </el-button>
-    <el-button type="primary" size="mini" @click="printByPrintJS">
+    <!--     <el-button type="primary" size="mini" @click="printByPrintJS">
       PrintJS
     </el-button>
     <el-button type="primary" size="mini" @click="printByhtml2canvas">
@@ -14,9 +14,15 @@
     </el-button>
     <el-button type="primary" size="mini" @click="printPage">
       printPage
-    </el-button>
+    </el-button> -->
     <el-button type="primary" size="mini" @click="printByhtml2pdf">
       html2pdf
+    </el-button>
+    <el-button type="primary" size="mini" @click="changeFontSize('20px')">
+      改变字体大小为20px
+    </el-button>
+    <el-button type="primary" size="mini" @click="renderAgain">
+      重新分页
     </el-button>
   </div>
 </template>
@@ -155,8 +161,27 @@ export default {
         }, 100);
       }
     },
+    changeFontSize(size) {
+      const selection = window.getSelection();
+      console.log("🚀selection:", selection);
+      if (!selection.rangeCount) return false;
+
+      const range = selection.getRangeAt(0);
+      console.log("🚀 range:", range);
+      if (range.collapsed) return false; // 没有选中任何文本
+
+      const span = document.createElement("span");
+      span.style.fontSize = size;
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+
+      // 清除当前选择并选择新的<span>元素
+      selection.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.selectNodeContents(span);
+      selection.addRange(newRange);
+    },
+    renderAgain() {},
   },
 };
 </script>
-
-<style lang="scss" scoped></style>

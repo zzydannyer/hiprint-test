@@ -2,13 +2,13 @@ import { getType } from "./index.js";
 import { TEMP_ENUM, TEMPLATES } from "./constants.js";
 
 class PrintCore {
-  constructor(dataUid, tempIndex, pagePadding) {
-    this.dataUid = dataUid;
+  constructor(data, tempIndex, pagePadding) {
+    this.data = data;
     this.tempIndex = tempIndex;
     this.pagePadding = pagePadding;
   }
-  // 数据的uid
-  dataUid = "";
+  // 数据
+  data;
   // 模板的索引
   tempIndex = 0;
   // 页面的内边距
@@ -37,13 +37,14 @@ class PrintCore {
       const truncated = this.addTd(tr, option, remainHeight);
       truncatedList.push(truncated);
     }
-    if (truncatedList.some((item) => item)) {
+    if (truncatedList.some((item) => item.content || item.img)) {
       this.pageIndex = this.pageIndex + 1;
       this.addPage();
       // 重新渲染
       const reRenderOption = truncatedList.map((item, index) => ({
         ...options[index],
-        content: item,
+        content: item.content,
+        img: item.img,
         title: remainHeight > 100 ? "" : options[index].title,
       }));
       this.paging(reRenderOption);
@@ -64,7 +65,19 @@ class PrintCore {
       td.appendChild(textNode);
     }
     // 截断的部分
-    let truncated = "";
+    let truncated = {};
+    // 设置图片
+    if (option.img) {
+      const img = document.createElement("img");
+      img.setAttribute("src", option.img);
+      img.style.width = "100%";
+      if (img.offsetHeight >= maxHeight) {
+        truncated.img = option.img;
+      }
+      if (!truncated.img) {
+        td.appendChild(img);
+      }
+    }
     // 设置内容
     if (option.content) {
       const div = document.createElement("div");
@@ -88,25 +101,17 @@ class PrintCore {
           // 给td设置高度消除误差
           td.style.height = maxHeight - 40 + "px";
           // untruncated = textContent.slice(0, i - 1);
-          truncated = option.content.slice(i - 1);
+          truncated.content = option.content.slice(i - 1);
           break;
         }
       }
     }
-    // 设置图片
-    if (option.img) {
-      const img = document.createElement("img");
-      img.setAttribute("src", option.img);
-      img.style.width = "100%";
-      // if(img.offsetHeight >= maxHeight) {
-      // }
-      td.appendChild(img);
-    }
     // 判断是否以 "\n" 开头
-    if (truncated.startsWith("\n")) {
+    if (truncated.content && truncated.content.startsWith("\n")) {
       // 如果是，去掉开头的 "\n"
-      truncated = truncated.substring(1);
+      truncated.content = truncated.content.substring(1);
     }
+
     return truncated;
   }
 
@@ -212,16 +217,16 @@ class PrintCore {
     showPageTitle && this.addCaption(page_table);
   }
 
-  render(data) {
+  render() {
     return new Promise((resolve) => {
-      this.baseId = `temp_${this.tempIndex}_uid_${this.dataUid}`;
+      this.baseId = `temp_${this.tempIndex}_uid_${this.data.uid}`;
       const container = document.getElementById(this.baseId + "_container");
       // 查看状态不能选择
       if (this.mode === "view") {
         container.style.userSelect = "none";
       }
       this.addPage(true);
-      const template = TEMPLATES[this.tempIndex](data);
+      const template = TEMPLATES[this.tempIndex](this.data);
       for (let tdOptions of template.tbody) {
         this.paging(tdOptions);
       }
