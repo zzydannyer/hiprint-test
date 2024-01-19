@@ -1,6 +1,10 @@
 <!-- 支部情况 -->
 <template>
-  <section class="form-section" :id="containerId" v-if="data?.uid" />
+  <section
+    class="form-section"
+    :id="containerId"
+    v-if="data?.uid || data?.length"
+  />
 </template>
 
 <script>
@@ -11,11 +15,11 @@ export default {
   name: "defaultTemplate",
   props: {
     data: {
-      type: Object,
+      type: Object | Array,
       default: () => null,
     },
-    tempIndex: {
-      type: Number,
+    tempName: {
+      type: String,
       require: true,
     },
   },
@@ -27,7 +31,7 @@ export default {
       footerHeight: 80,
       leftPadding: 80,
       rightPadding: 80,
-      // tempIndex: 1,
+      // tempName: 1,
       inputTimeout: null,
       loadingOptions: {
         lock: true,
@@ -39,17 +43,17 @@ export default {
   },
   computed: {
     containerId() {
-      return `temp_${this.tempIndex}_uid_${this.data.uid}_container`;
+      return `${this.tempName}_uid_${this.data.uid}_container`;
     },
   },
   watch: {
     data: {
       handler(val) {
-        if (val?.uid) {
+        if (val?.uid || val?.length) {
           this.$nextTick(() => {
             this.init(val);
-            const container = document.getElementById(this.containerId);
-            container.addEventListener("input", this.handleContentEdit);
+            // const container = document.getElementById(this.containerId);
+            // container.addEventListener("input", this.handleContentEdit);
           });
         }
       },
@@ -58,20 +62,25 @@ export default {
     },
   },
   beforeDestroy() {
-    const container = document.getElementById(this.containerId);
-    container.removeEventListener("input", this.handleContentEdit);
+    // const container = document.getElementById(this.containerId);
+    // container.removeEventListener("input", this.handleContentEdit);
   },
   methods: {
     init(data) {
+      console.log("🚀 " + this.tempName, data);
       this.printCore = new PrintCore(
         data,
-        this.tempIndex,
+        this.tempName,
         `${this.headerHeight}px ${this.rightPadding}px ${this.footerHeight}px ${this.leftPadding}px`
       );
       const loadingInstance = Loading.service(this.loadingOptions);
-      this.printCore.render().then(() => {
-        loadingInstance.close();
-      });
+      this.printCore
+        .render()
+        .then(() => {})
+        .catch(console.error)
+        .finally(() => {
+          loadingInstance.close();
+        });
     },
     handleContentEdit(e) {
       if (this.inputTimeout) {
@@ -85,7 +94,7 @@ export default {
         newData[e.target.dataset.key] = "";
 
         for (let i = 1; i <= this.printCore.pageIndex; i++) {
-          const id = `temp_${this.tempIndex}_uid_${this.data.uid}_page_${i}_key_${e.target.dataset.key}`;
+          const id = `${this.tempName}_uid_${this.data.uid}_page_${i}_key_${e.target.dataset.key}`;
           const target = document.getElementById(id);
           if (target) {
             newData[e.target.dataset.key] += target.textContent;

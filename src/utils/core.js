@@ -1,16 +1,18 @@
 import { getType } from "./index.js";
-import { TEMP_ENUM, TEMPLATES } from "./constants.js";
+import { TEMPLATES } from "./constants.js";
 
 class PrintCore {
-  constructor(data, tempIndex, pagePadding) {
+  constructor(data, tempName, pagePadding) {
     this.data = data;
-    this.tempIndex = tempIndex;
+    this.tempName = tempName;
     this.pagePadding = pagePadding;
   }
   // 数据
   data;
   // 模板的索引
-  tempIndex = 0;
+  tempName;
+  // 当前模板
+  template;
   // 页面的内边距
   pagePadding = "80px";
   // 页面索引
@@ -59,6 +61,7 @@ class PrintCore {
     option.colspan && td.setAttribute("colspan", option.colspan); // 设置跨列
     option.width && td.setAttribute("width", option.width); // 设置宽度
     option.align && td.setAttribute("align", option.align); // 设置对齐方式
+    option.style && (td.style = option.style); // 设置样式
     // 设置title
     if (option.title) {
       const textNode = document.createTextNode(option.title + "\n");
@@ -81,6 +84,7 @@ class PrintCore {
     // 设置内容
     if (option.content) {
       const div = document.createElement("div");
+      div.style.fontSize = "inherit";
       // 内容区域都加上id
       if (option.key !== "label") {
         div.setAttribute("id", this.currentPageId + "_key_" + option.key);
@@ -139,23 +143,9 @@ class PrintCore {
     }
 
     // 计算剩余高度（考虑内边距）
-    let remainHeight =
-      totalHeight - (innerElementsHeight + paddingTop + paddingBottom);
-    return remainHeight;
+    return totalHeight - (innerElementsHeight + paddingTop + paddingBottom);
   }
 
-  // 渲染tr前判断是否还有高度，是否需要新建一页
-  paging(options) {
-    const currentPage = document.getElementById(this.currentPageId);
-    const remainHeight = this.calcRemainHeight(currentPage);
-    if (remainHeight > 0) {
-      this.addTr(options, remainHeight);
-    } else {
-      this.pageIndex = this.pageIndex + 1;
-      this.addPage();
-      this.addTr(options, remainHeight);
-    }
-  }
   /**
    * @description 插入标题
    * @param {*} targetElement tbody
@@ -163,7 +153,7 @@ class PrintCore {
   addCaption(targetElement) {
     const caption = document.createElement("caption");
     caption.setAttribute("class", "form-header");
-    caption.textContent = TEMP_ENUM[this.tempIndex];
+    caption.textContent = this.tempName;
     targetElement.appendChild(caption);
     return caption;
   }
@@ -215,19 +205,48 @@ class PrintCore {
     page_table.appendChild(page_tbody);
     // 5. 添加标题到表单tbody
     showPageTitle && this.addCaption(page_table);
+    // 如果有表头，添加表头
+    if (this.template.theader) {
+      const theader = document.createElement("thead");
+      const theader_tr = document.createElement("tr");
+      theader.appendChild(theader_tr);
+      page_table.appendChild(theader);
+      for (let tdOptions of this.template.theader) {
+        this.addTd(theader_tr, tdOptions, 1000);
+      }
+    }
   }
-
+  // 渲染tr前判断是否还有高度，是否需要新建一页
+  paging(options) {
+    // 获取当前页
+    const currentPage = document.getElementById(this.currentPageId);
+    // 计算当前页剩余高度
+    const remainHeight = this.calcRemainHeight(currentPage);
+    // 如果剩余高度大于0，继续渲染
+    if (remainHeight > 0) {
+      this.addTr(options, remainHeight);
+    } else {
+      // 否则新建一页
+      this.pageIndex = this.pageIndex + 1;
+      this.addPage();
+      this.addTr(options, remainHeight);
+    }
+  }
   render() {
-    return new Promise((resolve) => {
-      this.baseId = `temp_${this.tempIndex}_uid_${this.data.uid}`;
+    return new Promise((resolve, reject) => {
+      // 获取当前模板下单条数据所展示的页面容器 根据uid分
+      this.baseId = `${this.tempName}_uid_${this.data.uid}`;
       const container = document.getElementById(this.baseId + "_container");
       // 查看状态不能选择
       if (this.mode === "view") {
         container.style.userSelect = "none";
       }
+      // 获取当前模板
+      this.template = TEMPLATES[this.tempName](this.data);
+      // 添加第一页
       this.addPage(true);
-      const template = TEMPLATES[this.tempIndex](this.data);
-      for (let tdOptions of template.tbody) {
+      // 循环添加内容
+      for (let tdOptions of this.template.tbody) {
         this.paging(tdOptions);
       }
       resolve();

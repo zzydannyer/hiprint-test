@@ -1,43 +1,43 @@
 const state = {
   templateInstances: {
     // 支部情况
-    template1Instance: null,
+    支部情况_instance: null,
     // 党支部委员名单
-    template2Instance: null,
+    党支部委员名单_instance: null,
     // 党小组长名单
-    template3Instance: null,
+    党小组长名单_instance: null,
     // 党小组管理
-    template4Instance: null,
+    党小组管理_instance: null,
     // 党员名册
-    template5Instance: null,
+    党员名册_instance: null,
     // 党员调动记录
-    template6Instance: null,
+    党员调动记录_instance: null,
     // 帮困记录
-    template7Instance: null,
+    帮困记录_instance: null,
     // 谈心谈话
-    template8Instance: null,
+    谈心谈话_instance: null,
     // 发展党员
-    template9Instance: null,
+    发展党员_instance: null,
     // 党支部大会记录
-    template10Instance: null,
+    党支部大会记录_instance: null,
     // 党支委会会议
-    template11Instance: null,
+    党支委会会议_instance: null,
     // 党小组会议
-    template12Instance: null,
+    党小组会议_instance: null,
     // 党课记录
-    template13Instance: null,
+    党课记录_instance: null,
     // 主题党日
-    template14Instance: null,
+    主题党日_instance: null,
     // 支部年度工作计划
-    template15Instance: null,
+    支部年度工作计划_instance: null,
     // 支部年度工作总结
-    template16Instance: null,
+    支部年度工作总结_instance: null,
     // 党费
-    template17Instance: null,
+    党费_instance: null,
     // 民主生活会
-    template18Instance: null,
+    民主生活会_instance: null,
     // 党员民主评议管理
-    template19Instance: null,
+    党员民主评议管理_instance: null,
   },
 };
 const getters = {};

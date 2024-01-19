@@ -146,9 +146,9 @@ body {
   left: 0;
   background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='gray' stroke-width='4' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
 }
-.form-section:last-child .form-container:last-child .dashed-line {
+/* .form-section:last-child .form-container:last-child .dashed-line {
   display: none;
-}
+} */
 .form-table {
 }
 .form-header {
@@ -166,7 +166,8 @@ body {
 }
 .form-tbody td {
   line-height: 20px;
-  font-size: 16px;
+  font-size: 14px;
   white-space: pre-wrap;
   overflow-wrap: break-word;
+  padding: 10px;
 }

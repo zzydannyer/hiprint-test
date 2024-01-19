@@ -5,7 +5,7 @@ function myStyle(mode) {
   const style = document.createElement("style");
   style.type = "text/css";
   // style.innerHTML = `@page { size: ${mode}; margin: 20mm;}`;
-  style.innerHTML = `@page { size: A4; margin: 20mm;}`;
+  style.innerHTML = `@page { size: A4; margin:0; }`;
   return style;
 }
 
