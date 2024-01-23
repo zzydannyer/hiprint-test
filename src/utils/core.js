@@ -244,13 +244,16 @@ class PrintCore {
       if (this.mode === "view") {
         container.style.userSelect = "none";
       }
-
-      // 添加第一页
-      this.addPage(true);
-      // 循环添加内容
-      for (let tdOptions of this.template.tbody) {
-        this.paging(tdOptions);
-      }
+      requestIdleCallback(() => {
+        // 添加第一页
+        this.addPage(true);
+        // 循环添加内容
+        for (let tdOptions of this.template.tbody) {
+          // requestIdleCallback(() => {
+          this.paging(tdOptions);
+          // });
+        }
+      });
       resolve();
     });
   }
