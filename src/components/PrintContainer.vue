@@ -6,15 +6,7 @@
       style="width: 794px; min-height: 1123px; box-sizing: border-box"
       id="print-container"
     >
-      <div id="test-id">
-        777777777777777777 777777777777777777 777777777777777777
-        777777777777777777 777777777777777777 777777777777777777
-        777777777777777777 777777777777777777 777777777777777777
-        777777777777777777 777777777777777777 777777777777777777
-        777777777777777777 777777777777777777 777777777777777777
-        777777777777777777 777777777777777777 777777777777777777
-      </div>
-      <!-- <section
+      <section
         v-for="tempName in defaultTemplateIndexs"
         :key="tempName"
         :id="tempName"
@@ -25,7 +17,7 @@
           :key="tData.uid"
           :data="tData"
         />
-      </section> -->
+      </section>
       <!-- <CanvasTemplate2 :data="data" /> -->
       <!-- <div
         style="
@@ -92,23 +84,3 @@ export default {
   },
 };
 </script>
-
-<style>
-#test-id {
-  padding: 20px;
-  background-color: #fff;
-  border: 1px solid red;
-  font-size: 60px;
-  page-break-inside: avoid; /* 防止div跨页 */
-}
-
-/* 第一页底边 */
-#test-id:first-child {
-  border-bottom: none;
-}
-
-/* 第二页顶边 */
-#test-id:last-child {
-  border-top: none;
-}
-</style>

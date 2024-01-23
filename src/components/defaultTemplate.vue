@@ -27,11 +27,6 @@ export default {
   data() {
     return {
       printCore: null,
-      headerHeight: 80,
-      footerHeight: 80,
-      leftPadding: 80,
-      rightPadding: 80,
-      // tempName: 1,
       inputTimeout: null,
       loadingOptions: {
         lock: true,
@@ -68,11 +63,7 @@ export default {
   methods: {
     init(data) {
       console.log("🚀 " + this.tempName, data);
-      this.printCore = new PrintCore(
-        data,
-        this.tempName,
-        `${this.headerHeight}px ${this.rightPadding}px ${this.footerHeight}px ${this.leftPadding}px`
-      );
+      this.printCore = new PrintCore(data, this.tempName);
       const loadingInstance = Loading.service(this.loadingOptions);
       this.printCore
         .render()

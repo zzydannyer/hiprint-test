@@ -2,10 +2,13 @@ import { getType } from "./index.js";
 import { TEMPLATES } from "./constants.js";
 
 class PrintCore {
-  constructor(data, tempName, pagePadding) {
+  constructor(data, tempName) {
     this.data = data;
     this.tempName = tempName;
-    this.pagePadding = pagePadding;
+    // 获取当前模板
+    this.template = TEMPLATES[this.tempName](this.data);
+    // 获取当前模板的内边距
+    this.pagePadding = this.template.pagePadding || "80px";
   }
   // 数据
   data;
@@ -14,7 +17,7 @@ class PrintCore {
   // 当前模板
   template;
   // 页面的内边距
-  pagePadding = "80px";
+  pagePadding;
   // 页面索引
   pageIndex = 1;
   // 基础id
@@ -241,8 +244,7 @@ class PrintCore {
       if (this.mode === "view") {
         container.style.userSelect = "none";
       }
-      // 获取当前模板
-      this.template = TEMPLATES[this.tempName](this.data);
+
       // 添加第一页
       this.addPage(true);
       // 循环添加内容
