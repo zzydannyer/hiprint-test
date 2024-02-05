@@ -1,5 +1,7 @@
 <template>
   <div id="app">
+    <el-button type="primary" @click="html2docx">点击html2docx</el-button>
+    <el-button type="primary" @click="docxPlugin">点击docxPlugin</el-button>
     <!-- :style="{
       width: `${page.width + 2}px`,
       minHeight: `${page.height + 2}px`,
@@ -11,8 +13,56 @@
         <span class="close" @click="handleClose"> &times; </span>
         <div> -->
     <!-- <CanvasEditor /> -->
-    <PrintContainer v-loading="loading" :data="templateData" />
-    <ToolBar />
+    <!-- <PrintContainer v-loading="loading" :data="templateData" /> -->
+    <div id="html2docx">
+      <span style="background-color: #f7f7f7; margin-bottom: 20px">
+        支部情况
+      </span>
+      <table>
+        <thead>
+          <tr>
+            <td>序号</td>
+            <td>重点内容</td>
+            <td>主要工作</td>
+            <td>具体措施</td>
+            <td>时间进度</td>
+            <td>责任人</td>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- <tr>
+            <td colspan="6"></td>
+          </tr> -->
+          <tr>
+            <td colspan="6">
+              <img :src="HTMLString.image" />
+            </td>
+          </tr>
+          <tr v-for="i in 2" :key="i">
+            <td>一</td>
+            <td>突出从严治党，加强党的政治建设</td>
+            <td>严肃党内政治生活</td>
+            <td>
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
+            </td>
+            <td>全年</td>
+            <td>党支部委员</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- <ToolBar /> -->
     <div style="text-align: center">
       <!-- <el-button type="primary" size="mini" @click="handleOpen">
         编辑打印
@@ -43,21 +93,45 @@
 import HelloWorld from "@/components/HelloWorld.vue";
 import ToolBar from "@/components/ToolBar.vue";
 import PrintContainer from "@/components/PrintContainer.vue";
-
+import { SIZE } from "./utils/constants";
+import { saveAs } from "file-saver";
+import Docxtemplater from "docxtemplater";
+import PizZip from "pizzip";
+import PizZipUtils from "pizzip/utils/index.js";
+import HTMLtoDOCX from "html-to-docx";
+// import officegen from "officegen";
 import "../public/printThis.js";
 import templateData from "./data";
+import HTMLString from "./utils/htmlString";
+// import { Buffer } from "buffer";
+import {
+  Document,
+  HeadingLevel,
+  Packer,
+  Paragraph,
+  Table,
+  TableCell,
+  TableRow,
+  VerticalAlign,
+  TextDirection,
+  ImageRun,
+  WidthType,
+} from "docx";
 
 import CanvasEditor from "./components/CanvasEditor.vue";
 
+// window.Buffer = Buffer;
+function loadFile(url, callback) {
+  PizZipUtils.getBinaryContent(url, callback);
+}
 // 计算分辨率
-
 // $(document).ready(function () {
-//   var selectedText = "";
-//   var $selectedCell = null;
+//   const selectedText = "";
+//   const $selectedCell = null;
 
 //   function getSelectedText() {
 //     if (window.getSelection) {
-//       var selection = window.getSelection();
+//       const selection = window.getSelection();
 //       if (selection.rangeCount > 0) {
 //         return selection.getRangeAt(0).toString();
 //       }
@@ -94,6 +168,14 @@ import CanvasEditor from "./components/CanvasEditor.vue";
 //     }
 //   });
 // });
+async function imageUrlToBlob(imageUrl) {
+  const response = await fetch(imageUrl);
+  if (!response.ok) {
+    throw new Error("Network response was not ok.");
+  }
+  const blob = await response.blob();
+  return blob;
+}
 
 export default {
   name: "App",
@@ -106,6 +188,7 @@ export default {
   provide() {
     return {
       PPI: this.PPI,
+      name: "xxxxxxxxxxxxxx支部",
     };
   },
   beforeCreate() {
@@ -121,6 +204,8 @@ export default {
       mode: "Portrait", // 打印横竖方向，竖portrait，横Landscape
       templateData: {},
       loading: false,
+      SIZE,
+      HTMLString,
     };
   },
   computed: {
@@ -142,7 +227,375 @@ export default {
   created() {
     this.getData();
   },
+  mounted() {
+    // this.renderDoc();
+    // this.docxPlugin();
+  },
   methods: {
+    HTML2DocxConfig(element) {
+      let docxElements = [];
+      // 处理单元格，考虑colspan和rowspan
+      function processCell(cellElement) {
+        const cellOptions = {
+          children: [new Paragraph(cellElement.textContent)],
+        };
+
+        // 处理colspan
+        if (cellElement.hasAttribute("colspan")) {
+          cellOptions.columnSpan = parseInt(
+            cellElement.getAttribute("colspan"),
+            10
+          );
+        }
+
+        // 处理rowspan（docx库可能不直接支持rowspan，这需要通过其他逻辑来模拟）
+        if (cellElement.hasAttribute("rowspan")) {
+          // 注意：处理rowspan可能需要跨多行调整单元格，这里不展开实现
+          console.log("Rowspan found, needs custom handling.");
+        }
+
+        return new TableCell(cellOptions);
+      }
+
+      // 处理表格行
+      function processRow(rowElement) {
+        const cells = Array.from(rowElement.querySelectorAll("td, th")).map(
+          processCell
+        );
+        return new TableRow({ children: cells });
+      }
+
+      // 处理整个表格
+      function processTable(tableElement) {
+        const rows = Array.from(tableElement.querySelectorAll("tr")).map(
+          processRow
+        );
+
+        return new Table({
+          rows: rows,
+          width: {
+            size: 100, // 示例宽度，需要根据实际情况调整
+            type: WidthType.PERCENTAGE,
+          },
+        });
+      }
+
+      function processElement(element) {
+        switch (element.tagName) {
+          case "P":
+            // 将<p>转换为Paragraph
+            docxElements.push(new Paragraph(element.textContent));
+            break;
+          case "STRONG":
+            // 将<strong>转换为加粗的TextRun
+            // 注意：这里简化处理，实际上<strong>可能包含在其他元素内部
+            docxElements.push(
+              new TextRun({ text: element.textContent, bold: true })
+            );
+            break;
+          case "UL":
+          case "OL":
+            // 对于列表，遍历子元素<li>，将每个<li>作为一个Paragraph
+            Array.from(element.children).forEach((li) => {
+              if (li.tagName === "LI") {
+                docxElements.push(new Paragraph(li.textContent));
+              }
+            });
+            break;
+          case "TABLE":
+            return processTable(element);
+          // 可以根据需要添加更多的case来处理其他HTML元素
+        }
+      }
+
+      function traverseElements(element) {
+        processElement(element);
+        Array.from(element.children).forEach(traverseElements);
+      }
+
+      // 开始遍历和转换
+      traverseElements(element);
+
+      return docxElements;
+    },
+    docxPlugin() {
+      const base64String = HTMLString.image;
+      const match = base64String.match(/^data:image\/png;base64,(.*)$/);
+      const base64Data = match ? match[1] : null;
+
+      // const doc = new Document({
+      //   sections: [
+      //     {
+      //       children: [
+      //         new Table({
+      //           rows: [
+      //             new TableRow({
+      //               children: [
+      //                 new TableCell({
+      //                   children: [
+      //                     new Paragraph({
+      //                       text: "支部名称",
+      //                     }),
+      //                   ],
+      //                   verticalAlign: VerticalAlign.CENTER,
+      //                 }),
+      //                 new TableCell({
+      //                   width: {
+      //                     size: 1,
+      //                     type: WidthType.DXA,
+      //                   },
+      //                   children: [
+      //                     new Paragraph({
+      //                       text: "xxxxxxxxxxxxxxxxxxx支部",
+      //                     }),
+      //                   ],
+      //                   verticalAlign: VerticalAlign.CENTER,
+      //                 }),
+      //               ],
+      //             }),
+      //             new TableRow({
+      //               children: [
+      //                 new TableCell({
+      //                   columnSpan: 2,
+      //                   children: [
+      //                     new Paragraph({
+      //                       text: HTMLString.text,
+      //                       heading: HeadingLevel.HEADING_1,
+      //                     }),
+      //                   ],
+      //                 }),
+      //               ],
+      //             }),
+      //             new TableRow({
+      //               children: [
+      //                 new TableCell({
+      //                   columnSpan: 2,
+      //                   children: [
+      //                     new Paragraph({
+      //                       children: [
+      //                         new ImageRun({
+      //                           data: Buffer.from(base64Data, "base64"),
+      //                           transformation: {
+      //                             width: 200,
+      //                             height: 200,
+      //                           },
+      //                         }),
+      //                       ],
+      //                     }),
+      //                   ],
+      //                 }),
+      //               ],
+      //             }),
+      //           ],
+      //         }),
+      //       ],
+      //     },
+      //   ],
+      // });
+      const htmlDOM = new DOMParser().parseFromString(
+        HTMLString.text,
+        "text/html"
+      );
+      const DOMContent = htmlDOM.body.firstChild;
+      const docxConfig = this.HTML2DocxConfig(DOMContent);
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: docxConfig,
+          },
+        ],
+      });
+
+      Packer.toBuffer(doc).then((buffer) => {
+        const blob = new Blob([buffer], { type: "application/octet-stream" });
+        saveAs(blob, "example.docx");
+      });
+    },
+    officegenFunc() {
+      const docx = officegen("docx");
+      const table = [
+        [
+          {
+            val: "No.",
+            opts: {
+              cellColWidth: 4261,
+              b: true,
+              sz: "48",
+              shd: {
+                fill: "7F7F7F",
+                themeFill: "text1",
+                themeFillTint: "80",
+              },
+              fontFamily: "Avenir Book",
+            },
+          },
+          {
+            val: "Title1",
+            opts: {
+              b: true,
+              color: "A00000",
+              align: "right",
+              shd: {
+                fill: "92CDDC",
+                themeFill: "text1",
+                themeFillTint: "80",
+              },
+            },
+          },
+          {
+            val: "Title2",
+            opts: {
+              align: "center",
+              cellColWidth: 42,
+              b: true,
+              sz: "48",
+              shd: {
+                fill: "92CDDC",
+                themeFill: "text1",
+                themeFillTint: "80",
+              },
+            },
+          },
+        ],
+        [1, "All grown-ups were once children", ""],
+        [
+          2,
+          "there is no harm in putting off a piece of work until another day.",
+          "",
+        ],
+        [
+          3,
+          "But when it is a matter of baobabs, that always means a catastrophe.",
+          "",
+        ],
+        [4, "watch out for the baobabs!", "END"],
+      ];
+
+      const tableStyle = {
+        tableColWidth: 4261,
+        tableSize: 24,
+        tableColor: "ada",
+        tableAlign: "left",
+        tableFontFamily: "Comic Sans MS",
+      };
+
+      const data = [
+        [
+          {
+            type: "text",
+            val: "Simple",
+          },
+          {
+            type: "text",
+            val: " with color",
+            opt: { color: "000088" },
+          },
+          {
+            type: "text",
+            val: "  and back color.",
+            opt: { color: "00ffff", back: "000088" },
+          },
+          {
+            type: "linebreak",
+          },
+          {
+            type: "text",
+            val: "Bold + underline",
+            opt: { bold: true, underline: true },
+          },
+        ],
+        {
+          type: "horizontalline",
+        },
+        [
+          { backline: "EDEDED" },
+          {
+            type: "text",
+            val: "  backline text1.",
+            opt: { bold: true },
+          },
+          {
+            type: "text",
+            val: "  backline text2.",
+            opt: { color: "000088" },
+          },
+        ],
+        {
+          type: "text",
+          val: "Left this text.",
+          lopt: { align: "left" },
+        },
+        {
+          type: "text",
+          val: "Center this text.",
+          lopt: { align: "center" },
+        },
+        {
+          type: "text",
+          val: "Right this text.",
+          lopt: { align: "right" },
+        },
+        {
+          type: "text",
+          val: "Fonts face only.",
+          opt: { font_face: "Arial" },
+        },
+        {
+          type: "text",
+          val: "Fonts face and size.",
+          opt: { font_face: "Arial", font_size: 40 },
+        },
+        {
+          type: "table",
+          val: table,
+          opt: tableStyle,
+        },
+        [
+          {
+            // arr[0] is common option.
+            align: "right",
+          },
+          {
+            type: "image",
+            path: HTMLString.image,
+          },
+          {
+            type: "image",
+            path: HTMLString.image,
+          },
+        ],
+        {
+          type: "pagebreak",
+        },
+      ];
+
+      docx.createByJson(data);
+      saveAs(docx, "example.docx");
+    },
+    async html2docx() {
+      const String = `<!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8" />
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width,initial-scale=1.0">
+                <title>Document</title>
+            </head>
+            <body>
+             ${document.getElementById("html2docx").outerHTML}
+            </body>
+        </html>`;
+      // const String = HTMLString.example;
+      const fileBuffer = await HTMLtoDOCX(String, null, {
+        table: { row: { cantSplit: false } },
+        header: true,
+        footer: true,
+        pageNumber: true,
+        fontSize: 16,
+      });
+      saveAs(fileBuffer, "html-to-docx.docx");
+    },
     getPPI() {
       const arrDPI = [];
       const tmpNode = document.createElement("div");
@@ -187,17 +640,80 @@ export default {
     printByPrintThis() {
       $("#app").printThis();
     },
+    renderDoc() {
+      loadFile("/test.docx", function (error, content) {
+        if (error) {
+          throw error;
+        }
+        const zip = new PizZip(content);
+        const doc = new Docxtemplater(zip, {
+          paragraphLoop: true,
+          linebreaks: true,
+        });
+        doc.setData({
+          name: "xxxxxx支部",
+          content: Array(2)
+            .fill(
+              '<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 机关党支部2022年工作任务清单</p>\r\n\r\n<table border="1" cellpadding="0" cellspacing="0" style="width:949px">\r\n\t<thead>\r\n\t\t<tr>\r\n\t\t\t<th style="height:21px; width:32px">\r\n\t\t\t<p>序号</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:21px; width:76px">\r\n\t\t\t<p>重点内容</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:21px; width:113px">\r\n\t\t\t<p>主要工作</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:21px; width:520px">\r\n\t\t\t<p>具体措施</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:21px; width:85px">\r\n\t\t\t<p>时间进度</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:21px; width:123px">\r\n\t\t\t<p>责任人</p>\r\n\t\t\t</th>\r\n\t\t</tr>\r\n\t</thead>\r\n\t<tbody>\r\n\t\t<tr>\r\n\t\t\t<td rowspan="5" style="height:36px; width:32px">\r\n\t\t\t<p>1</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="5" style="height:36px; width:76px">\r\n\t\t\t<p>持续强化政治引领，不断推动思想政治建设</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="2" style="height:36px; width:113px">\r\n\t\t\t<p>带头做&ldquo;两个确立&rdquo;的坚决拥护者和&ldquo;两个维护&rdquo;的坚定践行者</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:36px; width:520px">\r\n\t\t\t<p>结合政治教育，教育全体党员深刻把握&ldquo;两个确立&rdquo;的决定性意义，坚决做到&ldquo;两个维护&rdquo;，始终不渝拥戴核心、紧跟核心、捍卫核心。</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="3" style="height:36px; width:85px">\r\n\t\t\t<p>全年</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="2" style="height:36px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:36px; width:520px">\r\n\t\t\t<p>将按照巡察工作要求，全力支持配合集团巡察工作的开展，加强自查自纠，做好查漏补缺。</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:24px; width:113px">\r\n\t\t\t<p>学深悟透党的创新理论</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:24px; width:520px">\r\n\t\t\t<p>按照公司党委的学习安排，采取党小组集中学习、党员自学研读原文等方式，以学习党的十九届六中全会精神为重点巩固拓展党史学习教育成果，落实好全年党员学习时间不少于32学时的要求。</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:24px; width:123px">\r\n\t\t\t<p>支部班子成员 &nbsp;各党小组长</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td rowspan="2" style="height:39px; width:113px">\r\n\t\t\t<p>深入学习贯彻党的二十大精神</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:39px; width:520px">\r\n\t\t\t<p>围绕二十大的相关学习要求，认真组织研读相关学习材料，将全体党员的思想和行动统一到党的二十大作出的新部署、提出的新要求上。</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="2" style="height:39px; width:85px">\r\n\t\t\t<p>下半年</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="2" style="height:39px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:42px; width:520px">\r\n\t\t\t<p>充分运用&ldquo;学习强国&rdquo;、党建网等平台，结合自身岗位和具体工作，坚持学以致用，努力把学习成果转化为促进落实的具体举措、解决问题的实际成效。</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td rowspan="7" style="height:27px; width:32px">\r\n\t\t\t<p>2</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="7" style="height:27px; width:76px">\r\n\t\t\t<p>巩固深化党建目标责任制，不断夯实支部建设基础</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="3" style="height:27px; width:113px">\r\n\t\t\t<p>严肃党内政治生活</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:27px; width:520px">\r\n\t\t\t<p>严格执行&ldquo;三会一课&rdquo;、党员领导干部双重组织生活、民主评议党员等基本制度。</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="2" style="height:27px; width:85px">\r\n\t\t\t<p>全年</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:27px; width:123px">\r\n\t\t\t<p>党支部书记 &nbsp;&nbsp;&nbsp;各党小组长</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:36px; width:520px">\r\n\t\t\t<p>充分运用市内红色资源，组织党员参观见学、观摩红色电影，进一步丰富党支部主题党日形式和内容，提高组织生活质量。</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:36px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:36px; width:520px">\r\n\t\t\t<p>第二季度，组织开展民主评议党员，严格按照活动要求，用好批评和自我批评武器，深入查摆问题，制定整改措施，进一步提升党员的党性觉悟。</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:36px; width:85px">\r\n\t\t\t<p>第二季度</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:36px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:36px; width:113px">\r\n\t\t\t<p>认真开展党建目标责任制季度自查</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:36px; width:520px">\r\n\t\t\t<p>对标对表集团党建目标责任制任务指标和公司党支部考核要求，认真开展自查自纠，及时维护支部目视管理内容和党建平台数据信息，查缺补漏，落实落细党建目标责任制各项工作要求，</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="3" style="height:36px; width:85px">\r\n\t\t\t<p>全年</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:36px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td rowspan="3" style="height:36px; width:113px">\r\n\t\t\t<p>加强党员队伍建设管理</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:36px; width:520px">\r\n\t\t\t<p>充分运用部门例会、党课、党小组活动、志愿服务、党员培训等形式，加大党员日常教育管理力度，完善党员积分制管理，提升支部班子服务党员、服务职工、当好领导参谋助手的能力。</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="2" style="height:36px; width:123px">\r\n\t\t\t<p>支部班子成员</p>\r\n\r\n\t\t\t<p>各党小组长</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:36px; width:520px">\r\n\t\t\t<p>以&ldquo;学习强国&rdquo;、&ldquo;先锋上海&rdquo;、集团党建网等学习载体为抓手，提升党员学习意识和党性修养。</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:36px; width:520px">\r\n\t\t\t<p>严格规范程序，落实党员发展要求，上半年，完成1名发展对象的发展工作。继续加强对建表入党积极份子的培养和考察工作，补充2名入党积极份子，进一步优化入党梯队结构。</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:36px; width:85px">\r\n\t\t\t<p>上半年</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:36px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td rowspan="7" style="height:29px; width:32px">\r\n\t\t\t<p>3</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="7" style="height:29px; width:76px">\r\n\t\t\t<p>积极发挥服务保障作用，不断提高融入中心的能力</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="3" style="height:29px; width:113px">\r\n\t\t\t<p>发挥好机关服务保障作用</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:29px; width:520px">\r\n\t\t\t<p>围绕公司生产经营重点工作，组织党员干部积极开展立功竞赛、党员先锋岗等活动。</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="7" style="height:29px; width:85px">\r\n\t\t\t<p>全年</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="2" style="height:29px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:26px; width:520px">\r\n\t\t\t<p>把握引领、保障、服务三个环节，将党建力转化为推动公司发展的生产力，深刻融入生产经营中心工作。</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:17px; width:520px">\r\n\t\t\t<p>各部门党员要立足本职岗位、率先垂范、冲锋在前，不断提高工作能力和工作效益，为公司生产提供服务保障。</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:17px; width:123px">\r\n\t\t\t<p>支部班子成员各党小组长</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td rowspan="2" style="height:38px; width:113px">\r\n\t\t\t<p>坚决守牢防疫安全底线</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:38px; width:520px">\r\n\t\t\t<p>积极贯彻执行上级关于疫情防控的指示精神和决策部署，加强防疫宣传。结合部门例会、组织生活等方式，教育引导党员坚决克服麻痹思想和厌战情绪，强化责任担当。</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:38px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:38px; width:520px">\r\n\t\t\t<p>继续开展环境卫生消毒、食堂就餐防疫等志愿服务活动，努力营造同心抗疫的良好氛围。</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:38px; width:123px">\r\n\t\t\t<p>支部班子成员</p>\r\n\r\n\t\t\t<p>各党小组长</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td rowspan="2" style="height:38px; width:113px">\r\n\t\t\t<p>坚持创新引领发展</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:38px; width:520px">\r\n\t\t\t<p>持续推进支部书记工作室建设，依托工作室团队，进一步筹划好年度工作，细化责任分工，按照年度计划，完成目视展板制作上墙，营造工作室环境氛围。</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="2" style="height:38px; width:123px">\r\n\t\t\t<p>支部班子成员</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:38px; width:520px">\r\n\t\t\t<p>不断深化、拓展&ldquo;4&times;一公里&rdquo;工作室品牌内涵，凝聚好支委班子做好支部党建工作的合力，激发党员引领示范效应和服务保障作用，以点带面促进支部建设整体提升。</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t</tbody>\r\n\t<thead>\r\n\t\t<tr>\r\n\t\t\t<th rowspan="6" style="height:19px; width:32px">\r\n\t\t\t<p>4</p>\r\n\t\t\t</th>\r\n\t\t\t<th rowspan="6" style="height:19px; width:76px">\r\n\t\t\t<p>着力强化纪律约束，不断推进党风廉政建设</p>\r\n\t\t\t</th>\r\n\t\t\t<th rowspan="2" style="height:19px; width:113px">\r\n\t\t\t<p>严格落实党风廉政建设工作要求</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:19px; width:520px">\r\n\t\t\t<p>认真学习贯彻2022年度公司党风廉政建设工作要点，结合公司下发的领导班子年度党风廉政建设工作责任分分工表和责任清单等，开展支部和部门领导班子、领导干部党风廉政建设责任分工。</p>\r\n\t\t\t</th>\r\n\t\t\t<th rowspan="2" style="height:19px; width:85px">\r\n\t\t\t<p>第一季度</p>\r\n\t\t\t</th>\r\n\t\t\t<th rowspan="2" style="height:19px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</th>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<th style="height:37px; width:520px">\r\n\t\t\t<p>根据关键岗位人员变化情况，调整梳理党支部&ldquo;三级预控网络&rdquo;责任人队伍，组织关键岗位人员签订《廉洁承诺书》。</p>\r\n\t\t\t</th>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<th rowspan="3" style="height:46px; width:113px">\r\n\t\t\t<p>加大&ldquo;三检查一评议&rdquo;工作力度</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:46px; width:520px">\r\n\t\t\t<p>结合关键岗位人员调整和公司新业务的开展，对廉洁风险预控源进行梳理识别，调整预控岗位，制定预控措施。</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:46px; width:85px">\r\n\t\t\t<p>上半年</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:46px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</th>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<th style="height:46px; width:520px">\r\n\t\t\t<p>认真开展&ldquo;三级预控网络&rdquo;季度&ldquo;三检查一评议&rdquo;工作，规范网络运作，强化网络预控。以关键岗位为人员为主要对象，严格落实廉洁从业季度报告制度。</p>\r\n\t\t\t</th>\r\n\t\t\t<th rowspan="3" style="height:46px; width:85px">\r\n\t\t\t<p>全年</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:46px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</th>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<th style="height:46px; width:520px">\r\n\t\t\t<p>强化党内监督，结合公司开展的专项督查系列活动等，进一步加强对支部党员履行廉洁从业等遵纪收规情况的监督力度。</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:46px; width:123px">\r\n\t\t\t<p>支部班子成员</p>\r\n\t\t\t</th>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<th style="height:40px; width:113px">\r\n\t\t\t<p>驰而不息改进作风</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:40px; width:520px">\r\n\t\t\t<p>认真学习和落实公司关于加强党员干部作风建设的措施和要求，以提升执行力为重点，结合领导人员作风纪律教育活动、立功竞赛、大项工作、急难任务等，进一步加强党员干部作风教育，</p>\r\n\t\t\t</th>\r\n\t\t\t<th style="height:40px; width:123px">\r\n\t\t\t<p>支部班子成员&nbsp;&nbsp;&nbsp;&nbsp; 各党小组长</p>\r\n\t\t\t</th>\r\n\t\t</tr>\r\n\t</thead>\r\n\t<tbody>\r\n\t\t<tr>\r\n\t\t\t<td rowspan="4" style="height:34px; width:32px">\r\n\t\t\t<p>5</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="4" style="height:34px; width:76px">\r\n\t\t\t<p>加强维护队伍稳定，不断深化和谐家园建设</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="2" style="height:34px; width:113px">\r\n\t\t\t<p>坚持服务凝聚群众</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:34px; width:520px">\r\n\t\t\t<p>结合公司&ldquo;三会&rdquo;，充分运用领导班子宣讲形势任务、厂情发布会、公司领导联系党小组与班组、党群干部&ldquo;跟班&rdquo;等活动载体，深入开展形势任务宣传教育，凝聚职工思想共识。</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="4" style="height:34px; width:85px">\r\n\t\t\t<p>全年</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:34px; width:123px">\r\n\t\t\t<p>党支部书记</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:39px; width:520px">\r\n\t\t\t<p>经常关心职工思想、工作和生活情况，加大关怀帮扶力度，积极开展帮困送温暖和家访慰问工作，了解掌握职工及家庭实际状况，定期开展职工队伍思想状况分析，稳妥化解和处理不稳定因素，稳定职工队伍。</p>\r\n\t\t\t</td>\r\n\t\t\t<td rowspan="3" style="height:39px; width:123px">\r\n\t\t\t<p>支部班子成员 &nbsp;各党小组长</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:39px; width:113px">\r\n\t\t\t<p>持续推进企业文化建设</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:39px; width:520px">\r\n\t\t\t<p>组织职工积极参加公司组织开展的形式多样、内容丰富的职工文体活动。进一步做实服务职工实事项目，坚持做好劳动安全、防寒保暖、防暑降温、疫情防控等职工劳动保护工作。</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td style="height:37px; width:113px">\r\n\t\t\t<p>加强关心群团工作</p>\r\n\t\t\t</td>\r\n\t\t\t<td style="height:37px; width:520px">\r\n\t\t\t<p>认真落实公司加强群团工作的要求，大力支持团青工作，进一步增强群团组织的生机活力，发挥群团组织特殊优势，更好促进公司生产发展。</p>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t</tbody>\r\n</table>\r\n\r\n<p>&nbsp;</p>\r\n'
+            )
+            .join(""),
+          img: "https://img95.699pic.com/photo/50165/7667.jpg_wh860.jpg",
+        });
+        try {
+          // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
+          doc.render();
+        } catch (error) {
+          // The error thrown here contains additional information when logged with JSON.stringify (it contains a properties object containing all suberrors).
+          function replaceErrors(key, value) {
+            if (value instanceof Error) {
+              return Object.getOwnPropertyNames(value).reduce(function (
+                error,
+                key
+              ) {
+                error[key] = value[key];
+                return error;
+              },
+              {});
+            }
+            return value;
+          }
+          console.log(JSON.stringify({ error: error }, replaceErrors));
+
+          if (error.properties && error.properties.errors instanceof Array) {
+            const errorMessages = error.properties.errors
+              .map(function (error) {
+                return error.properties.explanation;
+              })
+              .join("\n");
+            console.log("errorMessages", errorMessages);
+            // errorMessages is a humanly readable message looking like this :
+            // 'The tag beginning with "foobar" is unopened'
+          }
+          throw error;
+        }
+        const out = doc.getZip().generate({
+          type: "blob",
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
+        // Output the document using Data-URI
+        saveAs(out, "output.docx");
+      });
+    },
   },
 };
 </script>
 
 <style>
-@import "@/styles/printStyle.css";
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+table td {
+  font-size: 12px;
+  padding: 10px;
 }
 </style>
