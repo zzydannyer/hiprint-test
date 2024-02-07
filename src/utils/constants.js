@@ -1,4 +1,4 @@
-export const SIZE = {
+const SIZE = {
   WIDTH: 794,
   HEIGHT: 1123,
 };
@@ -8,7 +8,29 @@ white-space:nowrap;
 color:#000;
 background-color:#f7f7f7;
 padding:10px;`;
-export const TEMPLATES = {
+
+const MAP = {
+  branchInfo: "支部情况",
+  committeeLeader: "党支部委员名单",
+  groupLeader: "党小组长名单",
+  memberGroup: "党小组管理",
+  formalMember: "党员名册",
+  memberTransfer: "党员调动记录",
+  help: "帮困记录",
+  talk: "谈心谈话",
+  developMember: "发展党员",
+  branch: "党支部大会记录",
+  brach: "党支委会会议",
+  orgLifeRecord: "党小组会议",
+  lessonRecord: "党课记录",
+  partyDay: "主题党日",
+  plan: "支部年度工作计划",
+  summary: "支部年度工作总结",
+  partyDuesSummary: "党费",
+  deliberation: "党员民主评议管理",
+};
+
+const TEMPLATES = {
   branchInfo: (data) => ({
     theader: null,
     data: data,
@@ -811,4 +833,45 @@ export const TEMPLATES = {
   //     ],
   //   ],
   // }),
+};
+const TEMPLATES2 = {
+  branchInfo: (data) => ({
+    data,
+    tableRows: [
+      {
+        tableCells: [
+          {
+            text: "支部名称",
+            width: 64,
+          },
+          {
+            text: data.orgName,
+          },
+        ],
+      },
+      {
+        tableCells: [
+          {
+            indentText: "支部介绍：",
+            text: data.introduce,
+            colspan: 2,
+          },
+        ],
+      },
+      {
+        tableCells: [
+          {
+            indentText: "照片：",
+            img: data.imgUrl,
+            colspan: 2,
+          },
+        ],
+      },
+    ],
+  }),
+};
+export default {
+  SIZE,
+  MAP,
+  TEMPLATES: TEMPLATES2,
 };

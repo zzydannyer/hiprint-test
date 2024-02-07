@@ -1,7 +1,8 @@
 <template>
   <div id="app">
-    <el-button type="primary" @click="html2docx">点击html2docx</el-button>
-    <el-button type="primary" @click="docxPlugin">点击docxPlugin</el-button>
+    <!-- <el-button type="primary" @click="html2docx">点击html2docx</el-button>
+    <el-button type="primary" @click="docxPlugin">点击docxPlugin</el-button> -->
+    <el-button type="primary" @click="docxCore">点击docxCore</el-button>
     <!-- :style="{
       width: `${page.width + 2}px`,
       minHeight: `${page.height + 2}px`,
@@ -15,6 +16,37 @@
     <!-- <CanvasEditor /> -->
     <!-- <PrintContainer v-loading="loading" :data="templateData" /> -->
     <div id="html2docx">
+      <table style="border: 0px">
+        <tr style="border: 0px">
+          <td
+            style="
+              width: 600px;
+              text-align: center;
+              padding: 6px;
+              border: 0px;
+              margin-bottom: 20px;
+              background-color: #f7f7f7;
+            "
+          >
+            <span>支部情况</span>
+          </td>
+        </tr>
+      </table>
+      <table>
+        <tbody>
+          <tr>
+            <td style="width: 100px; font-size: 10pt">支部名称</td>
+            <td style="width: 500px; font-size: 10pt">宜东分公司机关党支部</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="font-size: 10pt">内容</td>
+          </tr>
+        </tbody>
+      </table>
+      <div>
+        <span>支部介绍</span>
+        <div v-html="HTMLString.text"></div>
+      </div>
       <span style="background-color: #f7f7f7; margin-bottom: 20px">
         支部情况
       </span>
@@ -30,34 +62,11 @@
           </tr>
         </thead>
         <tbody>
-          <!-- <tr>
-            <td colspan="6"></td>
-          </tr> -->
+          <img src="" alt="" />
           <tr>
             <td colspan="6">
               <img :src="HTMLString.image" />
             </td>
-          </tr>
-          <tr v-for="i in 2" :key="i">
-            <td>一</td>
-            <td>突出从严治党，加强党的政治建设</td>
-            <td>严肃党内政治生活</td>
-            <td>
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-              1、按照公司党委部署和要求，认真组织好党员干部政治理论学习和党性党纪党规教育，党支部委员落实为党员上党课的要求。
-            </td>
-            <td>全年</td>
-            <td>党支部委员</td>
           </tr>
         </tbody>
       </table>
@@ -98,25 +107,26 @@ import { saveAs } from "file-saver";
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
 import PizZipUtils from "pizzip/utils/index.js";
-import HTMLtoDOCX from "html-to-docx";
+// import HTMLtoDOCX from "html-to-docx";
 // import officegen from "officegen";
+// import { Buffer } from "buffer";
 import "../public/printThis.js";
 import templateData from "./data";
 import HTMLString from "./utils/htmlString";
-// import { Buffer } from "buffer";
-import {
-  Document,
-  HeadingLevel,
-  Packer,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  VerticalAlign,
-  TextDirection,
-  ImageRun,
-  WidthType,
-} from "docx";
+import DocumentCreator from "@/docx/core";
+// import {
+//   Document,
+//   HeadingLevel,
+//   Packer,
+//   Paragraph,
+//   Table,
+//   TableCell,
+//   TableRow,
+//   VerticalAlign,
+//   TextDirection,
+//   ImageRun,
+//   WidthType,
+// } from "docx";
 
 import CanvasEditor from "./components/CanvasEditor.vue";
 
@@ -232,6 +242,10 @@ export default {
     // this.docxPlugin();
   },
   methods: {
+    docxCore() {
+      const page = new DocumentCreator();
+      page.create();
+    },
     HTML2DocxConfig(element) {
       let docxElements = [];
       // 处理单元格，考虑colspan和rowspan
