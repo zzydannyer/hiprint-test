@@ -842,7 +842,6 @@ const TEMPLATES2 = {
       const testImg = require("@/assets/branchInfo.png");
       convertImageToBase64(testImg, (imgData) => {
         resolve({
-          data,
           tableRows: [
             {
               tableCells: [
@@ -878,6 +877,9 @@ const TEMPLATES2 = {
         });
       });
     });
+  },
+  committeeLeader: (data) => {
+    return data.map((item) => {});
   },
 };
 export default {
