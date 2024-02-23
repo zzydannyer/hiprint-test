@@ -1,8 +1,10 @@
 <template>
   <div id="app">
-    <!-- <el-button type="primary" @click="html2docx">点击html2docx</el-button>
-    <el-button type="primary" @click="docxPlugin">点击docxPlugin</el-button> -->
+    <!-- <el-button type="primary" @click="html2docx">点击html2docx</el-button> -->
+    <el-button type="primary" @click="docxPlugin">点击docxPlugin</el-button>
     <el-button type="primary" @click="docxCore">点击docxCore</el-button>
+    <div id="bodyContainer"></div>
+    <div v-html="HTMLString.text"></div>
     <!-- :style="{
       width: `${page.width + 2}px`,
       minHeight: `${page.height + 2}px`,
@@ -15,7 +17,7 @@
         <div> -->
     <!-- <CanvasEditor /> -->
     <!-- <PrintContainer v-loading="loading" :data="templateData" /> -->
-    <div id="html2docx">
+    <!-- <div id="html2docx">
       <table style="border: 0px">
         <tr style="border: 0px">
           <td
@@ -36,6 +38,8 @@
         <tbody>
           <tr>
             <td style="width: 100px; font-size: 10pt">支部名称</td>
+
+            
             <td style="width: 500px; font-size: 10pt">宜东分公司机关党支部</td>
           </tr>
           <tr>
@@ -70,7 +74,7 @@
           </tr>
         </tbody>
       </table>
-    </div>
+    </div> -->
     <!-- <ToolBar /> -->
     <div style="text-align: center">
       <!-- <el-button type="primary" size="mini" @click="handleOpen">
@@ -114,19 +118,20 @@ import "../public/printThis.js";
 import templateData from "./data";
 import HTMLString from "./utils/htmlString";
 import DocumentCreator from "@/docx/core";
-// import {
-//   Document,
-//   HeadingLevel,
-//   Packer,
-//   Paragraph,
-//   Table,
-//   TableCell,
-//   TableRow,
-//   VerticalAlign,
-//   TextDirection,
-//   ImageRun,
-//   WidthType,
-// } from "docx";
+import { renderAsync } from "docx-preview";
+import {
+  Document,
+  HeadingLevel,
+  Packer,
+  Paragraph,
+  Table,
+  TableCell,
+  TableRow,
+  VerticalAlign,
+  TextDirection,
+  ImageRun,
+  WidthType,
+} from "docx";
 
 import CanvasEditor from "./components/CanvasEditor.vue";
 
@@ -216,6 +221,11 @@ export default {
       loading: false,
       SIZE,
       HTMLString,
+      styleConfig: {
+        fontSize: 18,
+        cellMargin: 100,
+        lineSpacing: 240,
+      },
     };
   },
   computed: {
@@ -248,13 +258,27 @@ export default {
     },
     HTML2DocxConfig(element) {
       let docxElements = [];
-      // 处理单元格，考虑colspan和rowspan
+      let that = this;
       function processCell(cellElement) {
+        const paragraph = new Paragraph({
+          text: cellElement.textContent,
+          // 设置段落字体大小
+          run: {
+            size: that.styleConfig.fontSize,
+          },
+        });
         const cellOptions = {
-          children: [new Paragraph(cellElement.textContent)],
+          children: [paragraph],
+          margins: {
+            top: that.styleConfig.cellMargin,
+            bottom: that.styleConfig.cellMargin,
+            left: that.styleConfig.cellMargin,
+            right: that.styleConfig.cellMargin,
+          },
+          verticalAlign: VerticalAlign.CENTER,
         };
 
-        // 处理colspan
+        // 处理 colspan
         if (cellElement.hasAttribute("colspan")) {
           cellOptions.columnSpan = parseInt(
             cellElement.getAttribute("colspan"),
@@ -262,16 +286,17 @@ export default {
           );
         }
 
-        // 处理rowspan（docx库可能不直接支持rowspan，这需要通过其他逻辑来模拟）
+        // 处理 rowspan
         if (cellElement.hasAttribute("rowspan")) {
-          // 注意：处理rowspan可能需要跨多行调整单元格，这里不展开实现
-          console.log("Rowspan found, needs custom handling.");
+          cellOptions.rowSpan = parseInt(
+            cellElement.getAttribute("rowspan"),
+            10
+          );
         }
 
         return new TableCell(cellOptions);
       }
 
-      // 处理表格行
       function processRow(rowElement) {
         const cells = Array.from(rowElement.querySelectorAll("td, th")).map(
           processCell
@@ -279,16 +304,15 @@ export default {
         return new TableRow({ children: cells });
       }
 
-      // 处理整个表格
       function processTable(tableElement) {
         const rows = Array.from(tableElement.querySelectorAll("tr")).map(
           processRow
         );
 
         return new Table({
-          rows: rows,
+          rows,
           width: {
-            size: 100, // 示例宽度，需要根据实际情况调整
+            size: 100, // 示例宽度，具体值应根据需要调整
             type: WidthType.PERCENTAGE,
           },
         });
@@ -296,39 +320,22 @@ export default {
 
       function processElement(element) {
         switch (element.tagName) {
-          case "P":
-            // 将<p>转换为Paragraph
-            docxElements.push(new Paragraph(element.textContent));
-            break;
-          case "STRONG":
-            // 将<strong>转换为加粗的TextRun
-            // 注意：这里简化处理，实际上<strong>可能包含在其他元素内部
-            docxElements.push(
-              new TextRun({ text: element.textContent, bold: true })
-            );
-            break;
-          case "UL":
-          case "OL":
-            // 对于列表，遍历子元素<li>，将每个<li>作为一个Paragraph
-            Array.from(element.children).forEach((li) => {
-              if (li.tagName === "LI") {
-                docxElements.push(new Paragraph(li.textContent));
-              }
-            });
-            break;
           case "TABLE":
-            return processTable(element);
-          // 可以根据需要添加更多的case来处理其他HTML元素
+            docxElements.push(processTable(element));
+            break;
+          // 实现其他标签的处理逻辑...
         }
       }
 
       function traverseElements(element) {
-        processElement(element);
+        if (element.tagName) {
+          // 确保只处理元素节点
+          processElement(element);
+        }
         Array.from(element.children).forEach(traverseElements);
       }
 
-      // 开始遍历和转换
-      traverseElements(element);
+      traverseElements(element); // 从给定的根元素开始遍历
 
       return docxElements;
     },
@@ -423,8 +430,38 @@ export default {
 
       Packer.toBuffer(doc).then((buffer) => {
         const blob = new Blob([buffer], { type: "application/octet-stream" });
-        saveAs(blob, "example.docx");
+        // saveAs(blob, "example.docx");
+        renderAsync(blob, document.getElementById("bodyContainer"), null, {
+          ignoreLastRenderedPageBreak: false,
+        });
       });
+    },
+    renderDocx(options) {
+      if (typeof window !== "undefined") {
+        const {
+          bodyContainer,
+          styleContainer,
+          buffer,
+          docxOptions = {},
+        } = options;
+        const defaultOptions = {
+          className: "docx",
+          ignoreLastRenderedPageBreak: false,
+        };
+        const configuration = Object.assign({}, defaultOptions, docxOptions);
+        if (bodyContainer) {
+          return renderAsync(
+            buffer,
+            bodyContainer,
+            styleContainer,
+            configuration
+          );
+        } else {
+          const contain = document.createElement("div");
+          document.body.appendChild(contain);
+          return renderAsync(buffer, contain, styleContainer, configuration);
+        }
+      }
     },
     officegenFunc() {
       const docx = officegen("docx");
@@ -719,7 +756,7 @@ export default {
 </script>
 
 <style>
-#app {
+/* #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -729,5 +766,5 @@ export default {
 table td {
   font-size: 12px;
   padding: 10px;
-}
+} */
 </style>

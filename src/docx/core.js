@@ -1,30 +1,77 @@
 import * as DOCX from "docx";
 import CONSTANTS from "@/utils/constants";
 import TEMP_DATA from "@/data";
+import { renderAsync } from "docx-preview";
 import { saveAs } from "file-saver";
-import { Buffer } from "buffer";
+// import { Buffer } from "buffer";
 
-window.Buffer = Buffer;
+// window.Buffer = Buffer;
+
+const styles = {
+  default: {
+    document: {
+      run: {
+        font: "SimSun",
+      },
+    },
+  },
+  paragraphStyles: [
+    {
+      id: "pageTitle",
+      name: "pageTitle",
+      basedOn: "Normal",
+      next: "Normal",
+      run: {
+        color: "000000",
+        bold: true,
+        size: 32,
+      },
+      paragraph: {
+        spacing: {
+          before: 0,
+          after: 276,
+        },
+      },
+    },
+    {
+      id: "cellParagraph",
+      name: "cellParagraph",
+      basedOn: "Normal",
+      next: "Normal",
+      run: {
+        color: "000000",
+        size: 20,
+      },
+      paragraph: {
+        spacing: {
+          line: 276,
+          before: 140,
+          after: 140,
+          left: 200,
+          right: 200,
+        },
+      },
+    },
+  ],
+};
 
 class DocumentCreator {
-  constructor() {}
-  imgBlob;
   async create() {
     const titleSec = this.createTitle("branchInfo");
-    const tableSec = await this.createTable(
-      "branchInfo",
-      TEMP_DATA["branchInfo"]
-    );
+    let tableSec = this.createTable("branchInfo", TEMP_DATA["branchInfo"]);
+    if (tableSec instanceof Promise) {
+      tableSec = await tableSec;
+    }
     const docSec = [titleSec, tableSec];
     const doc = new DOCX.Document({
+      styles,
       sections: [
         {
           properties: { type: DOCX.SectionType.CONTINUOUS },
-          children: [docSec],
+          children: docSec,
         },
       ],
     });
-
     this.save(doc);
   }
 
@@ -36,121 +83,144 @@ class DocumentCreator {
     });
     const TIT_PAR = new DOCX.Paragraph({
       children: [TIT_TEXT],
+      style: "pageTitle",
       alignment: DOCX.AlignmentType.CENTER, // 文字居中
       shading: {
         type: DOCX.ShadingType.CLEAR, // 背景类型
         color: "auto",
         fill: "F7F7F7", // 背景颜色为 #f7f7f7
       },
-      padding: {
-        top: 100,
-        bottom: 100,
-        left: 100,
-        right: 100,
-      },
-      borders: {
+      border: {
         top: {
-          color: "FFFFFF", // 设置边框颜色为白色，相当于无边框效果
-          size: 0,
+          color: "F7F7F7",
+          size: 40,
           space: 0,
+          style: DOCX.BorderStyle.SINGLE,
         },
         bottom: {
-          color: "FFFFFF",
-          size: 0,
+          color: "F7F7F7",
+          size: 40,
           space: 0,
-        },
-        left: {
-          color: "FFFFFF",
-          size: 0,
-          space: 0,
-        },
-        right: {
-          color: "FFFFFF",
-          size: 0,
-          space: 0,
+          style: DOCX.BorderStyle.SINGLE,
         },
       },
     });
     return TIT_PAR;
   }
-  createTable(temp, data) {
-    return new Promise((resolveTable) => {
-      const tempFn = CONSTANTS.TEMPLATES[temp];
-      const template = tempFn(data);
-      if (!tempFn || !template) return null;
+  async createTable(temp, data) {
+    const tempFn = CONSTANTS.TEMPLATES[temp];
+    let template = tempFn(data);
+    if (!tempFn || !template) return null;
 
-      const imgPromise = [];
-
-      for (let tableRow of template.tableRows) {
-        for (let cellIndex in tableRow.tableCells) {
-          const tableCell = tableRow.tableCells[cellIndex];
-          const cellChildren = [];
-          // 表单内容的标题
-          if (tableRow.indentText) {
-            cellChildren[cellIndex] = new DOCX.Paragraph(tableRow.indentText);
-          }
-          // 表单中的图片
-          if (tableRow.img) {
-            const imgUrl = require("@/assets/branchInfo.png");
-            imgPromise.push(
-              this.getImageAsBlob(imgUrl).then((blob) => {
-                const url = URL.createObjectURL(blob);
-                console.log(blob, url);
-
-                cellChildren[cellIndex] = new DOCX.ImageRun({
-                  data: blob,
-                  transformation: { width: 100, height: 100 },
-                });
-                new DOCX.TableCell({ children: cellChildren });
-              })
-            );
-          }
-        }
-      }
-
-      Promise.all(rowsPromises).then((rows) => {
-        // 过滤掉可能因错误解析为null的行
-        const filteredRows = rows.filter((row) => row !== null);
-
-        const TABLE = new DOCX.Table({
-          rows: filteredRows,
-          width: {
-            size: 100,
-            type: DOCX.WidthType.PERCENTAGE,
-          },
-        });
-
-        resolveTable(TABLE);
-      });
+    let rows;
+    if (template instanceof Promise) {
+      template = await template;
+    }
+    rows = this.handleTemplate(template);
+    return new DOCX.Table({
+      rows,
+      width: {
+        size: 100,
+        type: DOCX.WidthType.PERCENTAGE,
+      },
     });
+  }
+
+  // 生成文字
+  createTextRun(text, opts = {}) {
+    return new DOCX.TextRun({
+      text,
+      break: opts.break || 0,
+    });
+  }
+  // 生成段落
+  createParagraph(children, style = "cellParagraph") {
+    return new DOCX.Paragraph({
+      style,
+      children,
+    });
+  }
+  // 生成图片
+  createImageRun(data, ratio, width = 572) {
+    return new DOCX.ImageRun({
+      data,
+      transformation: {
+        width,
+        height: width / ratio,
+      },
+    });
+  }
+  // 根据模板生成表单
+  handleTemplate(template) {
+    const rows = [];
+    for (let tableRow of template.tableRows) {
+      const row = [];
+      for (let tableCell of tableRow.tableCells) {
+        const paragraph = [];
+
+        // 表单内容的标题
+        if (tableCell.indentText) {
+          paragraph.push(this.createTextRun(tableCell.indentText));
+        }
+
+        // 单元格文字内容
+        if (tableCell.text) {
+          const opt = tableCell.indentText ? { break: 1 } : {};
+          paragraph.push(this.createTextRun(tableCell.text, opt));
+        }
+
+        // 表单中的富文本
+        if (tableCell.html) {
+          // paragraph.push(new DOCX.TextRun(tableCell.richText));
+        }
+
+        // 表单中的图片
+        if (tableCell.img) {
+          paragraph.push(
+            this.createImageRun(tableCell.img.base64, tableCell.img.ratio)
+          );
+        }
+
+        // 每个cell里套一层paragraph
+        const cell = this.createParagraph(paragraph);
+
+        // 把一串cell放到一行row里
+        row.push(
+          new DOCX.TableCell({
+            columnSpan: tableCell.colSpan ?? 1,
+            width: {
+              size: tableCell.width ?? 100,
+              type: DOCX.WidthType.PERCENTAGE,
+            },
+            // margins: {
+            //   top: 140,
+            //   bottom: 140,
+            //   right: 200,
+            //   left: 200,
+            // },
+            verticalAlign: DOCX.VerticalAlign.CENTER,
+            textDirection: DOCX.TextDirection.LEFT_TO_RIGHT_TOP_TO_BOTTOM,
+            children: [cell],
+          })
+        );
+      }
+      rows.push(
+        new DOCX.TableRow({
+          children: row,
+        })
+      );
+    }
+    return rows;
   }
   save(doc) {
     DOCX.Packer.toBlob(doc)
       .then((blob) => {
         saveAs(blob, "2023党支部套打文档.docx");
+        renderAsync(blob, document.getElementById("bodyContainer"), null, {
+          ignoreLastRenderedPageBreak: false,
+        });
       })
       .catch(console.error);
-  }
-  async getImageAsBlob(imageUrl) {
-    try {
-      const response = await fetch(imageUrl);
-      if (!response.ok) throw new Error("Network response was not ok");
-      const imageBlob = await response.blob();
-      return imageBlob;
-    } catch (error) {
-      console.error("Error fetching image:", error);
-    }
-  }
-  // 清理所有Blob数据
-  clearBlobs() {
-    // 如果你为Blob创建了Object URLs，需要先撤销它们
-    this.imgBlobs.forEach((blob) => {
-      const url = URL.createObjectURL(blob);
-      URL.revokeObjectURL(url);
-    });
-
-    // 清空数组，移除对Blob的引用
-    this.imgBlobs = [];
   }
 }
 

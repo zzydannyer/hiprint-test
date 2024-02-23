@@ -1,3 +1,5 @@
+import { convertImageToBase64 } from "./index.js";
+
 const SIZE = {
   WIDTH: 794,
   HEIGHT: 1123,
@@ -55,7 +57,7 @@ const TEMPLATES = {
           title: "支部介绍：",
           key: "introduce",
           content: data.introduce,
-          colspan: 2,
+          colSpan: 2,
           editable: false,
           breakInside: true,
         },
@@ -65,7 +67,7 @@ const TEMPLATES = {
           title: "照片：",
           key: "imgUrl",
           img: data.imgUrl,
-          colspan: 2,
+          colSpan: 2,
           editable: false,
           breakInside: false,
         },
@@ -347,7 +349,7 @@ const TEMPLATES = {
   //         title: "会议主题或主要内容：",
   //         key: "main",
   //         content: "第⼀党⽀部四季度党员⼤会",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -357,7 +359,7 @@ const TEMPLATES = {
   //         title: "出席：",
   //         key: "showup",
   //         content: "全体出席",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -367,7 +369,7 @@ const TEMPLATES = {
   //         title: "缺席：",
   //         key: "quexi",
   //         content: "",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -388,14 +390,14 @@ const TEMPLATES = {
   //         3、2024年度⽀部⼯作计划；
   //         4、“元旦、春节”节前党⻛廉政教育学习；
   //         5、公司领导讲话"`,
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
   //     ],
   //     [
   //       { key: "label", content: "备注", width: 64, editable: false },
-  //       { key: "orgName", content: "无备注", colspan: 3, editable: false },
+  //       { key: "orgName", content: "无备注", colSpan: 3, editable: false },
   //     ],
   //   ],
   // }),
@@ -438,7 +440,7 @@ const TEMPLATES = {
   //         设社会主义法治⽂化”为主题法治宣传周活动 5、中央纪委国家监委公开通报七起违反中央⼋项规定精神典型问题 6、同盛物流公司关于开展第⼆⼗四次党⻛廉政教育活
   //         动的通知 7、结合学习内容和⼯作实际开展主题业务交流：⽆纸化办公，洋⼭物流安监部采⽤电⼦整改单经验分享。 8、党建⽹评论质量确保每⽉党员6 条评论，专兼职
   //         党务⼯作⼈员10 条评论；提⾼党《学习强国》参与率，党员每天上线按时进⾏学习，专兼职党务⼯作⼈员每⽉不少于800 积分`,
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -448,7 +450,7 @@ const TEMPLATES = {
   //         title: "出席：",
   //         key: "showup",
   //         content: "全体出席",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -458,7 +460,7 @@ const TEMPLATES = {
   //         title: "缺席：",
   //         key: "quexi",
   //         content: "",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -479,14 +481,14 @@ const TEMPLATES = {
   //         3、2024年度⽀部⼯作计划；
   //         4、“元旦、春节”节前党⻛廉政教育学习；
   //         5、公司领导讲话"`,
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
   //     ],
   //     [
   //       { key: "label", content: "备注", width: 64, editable: false },
-  //       { key: "orgName", content: "无备注", colspan: 3, editable: false },
+  //       { key: "orgName", content: "无备注", colSpan: 3, editable: false },
   //     ],
   //   ],
   // }),
@@ -500,7 +502,7 @@ const TEMPLATES = {
   //         key: "main",
   //         content:
   //           "公司党委副书记总经理上廉政党课《警钟⻓鸣始于⼼，⻛清正⽓践于⾏》",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -511,7 +513,7 @@ const TEMPLATES = {
   //         key: "showup",
   //         content:
   //           "任胜华、詹永忠、林中芳、陈建清、卫锋、周向军、陈玲⼦、赵平、袁慧强、刘兵、⾼强、张毅、朱专东、陈健",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -521,7 +523,7 @@ const TEMPLATES = {
   //         title: "缺席：",
   //         key: "quexi",
   //         content: "彭⽴卫",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -553,14 +555,14 @@ const TEMPLATES = {
   //         正在转型，虽然困难但要有信⼼，要有攻坚克难的准备。只有良好的党⻛才能营造良好的范围。
   //         最后，感谢⼤家，在2023年即将过去的时候，感谢⼤家⼀年来的付出，特别是疫情过后市场形势不佳，⼤家在岗位上的付出，做出贡献，谢谢⼤
   //         家`,
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
   //     ],
   //     [
   //       { key: "label", content: "备注", width: 64, editable: false },
-  //       { key: "orgName", content: "无备注", colspan: 3, editable: false },
+  //       { key: "orgName", content: "无备注", colSpan: 3, editable: false },
   //     ],
   //   ],
   // }),
@@ -574,7 +576,7 @@ const TEMPLATES = {
   //         key: "main",
   //         content:
   //           "公司党委副书记总经理上廉政党课《警钟⻓鸣始于⼼，⻛清正⽓践于⾏》",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -585,7 +587,7 @@ const TEMPLATES = {
   //         key: "showup",
   //         content:
   //           "任胜华、詹永忠、林中芳、陈建清、卫锋、周向军、陈玲⼦、赵平、袁慧强、刘兵、⾼强、张毅、朱专东、陈健",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -595,7 +597,7 @@ const TEMPLATES = {
   //         title: "缺席：",
   //         key: "quexi",
   //         content: "彭⽴卫",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -627,14 +629,14 @@ const TEMPLATES = {
   //         正在转型，虽然困难但要有信⼼，要有攻坚克难的准备。只有良好的党⻛才能营造良好的范围。
   //         最后，感谢⼤家，在2023年即将过去的时候，感谢⼤家⼀年来的付出，特别是疫情过后市场形势不佳，⼤家在岗位上的付出，做出贡献，谢谢⼤
   //         家`,
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
   //     ],
   //     [
   //       { key: "label", content: "备注", width: 64, editable: false },
-  //       { key: "orgName", content: "无备注", colspan: 3, editable: false },
+  //       { key: "orgName", content: "无备注", colSpan: 3, editable: false },
   //     ],
   //   ],
   // }),
@@ -677,7 +679,7 @@ const TEMPLATES = {
   //         正在转型，虽然困难但要有信⼼，要有攻坚克难的准备。只有良好的党⻛才能营造良好的范围。
   //         最后，感谢⼤家，在2023年即将过去的时候，感谢⼤家⼀年来的付出，特别是疫情过后市场形势不佳，⼤家在岗位上的付出，做出贡献，谢谢⼤
   //         家`,
-  //         colspan: 2,
+  //         colSpan: 2,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -723,7 +725,7 @@ const TEMPLATES = {
   //         正在转型，虽然困难但要有信⼼，要有攻坚克难的准备。只有良好的党⻛才能营造良好的范围。
   //         最后，感谢⼤家，在2023年即将过去的时候，感谢⼤家⼀年来的付出，特别是疫情过后市场形势不佳，⼤家在岗位上的付出，做出贡献，谢谢⼤
   //         家`,
-  //         colspan: 2,
+  //         colSpan: 2,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -775,7 +777,7 @@ const TEMPLATES = {
   //         key: "main",
   //         content:
   //           "公司党委副书记总经理上廉政党课《警钟⻓鸣始于⼼，⻛清正⽓践于⾏》",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -786,7 +788,7 @@ const TEMPLATES = {
   //         key: "showup",
   //         content:
   //           "任胜华、詹永忠、林中芳、陈建清、卫锋、周向军、陈玲⼦、赵平、袁慧强、刘兵、⾼强、张毅、朱专东、陈健",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -796,7 +798,7 @@ const TEMPLATES = {
   //         title: "缺席：",
   //         key: "quexi",
   //         content: "彭⽴卫",
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
@@ -822,53 +824,61 @@ const TEMPLATES = {
   //         朱军：在业务上缺乏专业知识，要多向部⻔其他同事学习，带领好部⻔员⼯，努⼒开拓市场。
   //         张雪华：作为党⼩组⻓，可能也都按照组织要求学什么就学什么，主动学的意识不强，对于理论知识理解的还不透彻，还是要静下⼼来多读书，
   //         读好书。其次对于⼯作上，有时还不够仔细，在合同、投标资料上要更细⼼更专业。`,
-  //         colspan: 4,
+  //         colSpan: 4,
   //         editable: false,
   //         breakInside: false,
   //       },
   //     ],
   //     [
   //       { key: "label", content: "备注", width: 64, editable: false },
-  //       { key: "orgName", content: "无备注", colspan: 4, editable: false },
+  //       { key: "orgName", content: "无备注", colSpan: 4, editable: false },
   //     ],
   //   ],
   // }),
 };
 const TEMPLATES2 = {
-  branchInfo: (data) => ({
-    data,
-    tableRows: [
-      {
-        tableCells: [
-          {
-            text: "支部名称",
-            width: 64,
-          },
-          {
-            text: data.orgName,
-          },
-        ],
-      },
-      {
-        tableCells: [
-          {
-            indentText: "支部介绍：",
-            text: data.introduce,
-            colspan: 2,
-          },
-        ],
-      },
-      {
-        tableCells: [
-          {
-            indentText: "照片：",
-            img: data.imgUrl,
-            colspan: 2,
-          },
-        ],
-      },
-    ],
-  }),
+  branchInfo: (data) => {
+    return new Promise((resolve, reject) => {
+      const testImg = require("@/assets/branchInfo.png");
+      convertImageToBase64(testImg, (imgData) => {
+        resolve({
+          data,
+          tableRows: [
+            {
+              tableCells: [
+                {
+                  text: "支部名称",
+                  width: 20,
+                },
+                {
+                  text: data.orgName,
+                  width: 80,
+                },
+              ],
+            },
+            {
+              tableCells: [
+                {
+                  indentText: "支部介绍：",
+                  text: data.introduce,
+                  colSpan: 2,
+                },
+              ],
+            },
+            {
+              tableCells: [
+                {
+                  indentText: "照片：",
+                  img: { ...imgData },
+                  colSpan: 2,
+                },
+              ],
+            },
+          ],
+        });
+      });
+    });
+  },
 };
 export default {
   SIZE,
