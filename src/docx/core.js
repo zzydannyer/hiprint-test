@@ -2,126 +2,116 @@ import * as DOCX from "docx";
 import CONSTANTS from "@/utils/constants";
 import TEMP_DATA from "@/data";
 import { renderAsync } from "docx-preview";
+import styles, { pageTitleStyle } from "./styles";
 import { saveAs } from "file-saver";
-// import { Buffer } from "buffer";
 
+// import { Buffer } from "buffer";
 // window.Buffer = Buffer;
 
-const styles = {
-  default: {
-    document: {
-      run: {
-        font: "SimSun",
-      },
-    },
-  },
-  paragraphStyles: [
-    {
-      id: "pageTitle",
-      name: "pageTitle",
-      basedOn: "Normal",
-      next: "Normal",
-      run: {
-        color: "000000",
-        bold: true,
-        size: 32,
-      },
-      paragraph: {
-        spacing: {
-          before: 0,
-          after: 276,
-        },
-      },
-    },
-    {
-      id: "cellParagraph",
-      name: "cellParagraph",
-      basedOn: "Normal",
-      next: "Normal",
-      run: {
-        color: "000000",
-        size: 20,
-      },
-      paragraph: {
-        spacing: {
-          line: 276,
-          before: 140,
-          after: 140,
-          left: 200,
-          right: 200,
-        },
-      },
-    },
-  ],
-};
-
+const actives = ["branchInfo", "committeeLeader"];
 class DocumentCreator {
   async create() {
-    const titleSec = this.createTitle("branchInfo");
-    let tableSec = this.createTable("branchInfo", TEMP_DATA["branchInfo"]);
-    if (tableSec instanceof Promise) {
-      tableSec = await tableSec;
+    const _templates = actives.map((active) => {
+      const temp = CONSTANTS.TEMPLATES[active];
+      if (temp.type === "FORM") {
+        return this.convertForm(temp, TEMP_DATA[active]);
+      } else if (temp.type === "TABLE") {
+        return this.convertTable(temp, TEMP_DATA[active]);
+      } else {
+        throw new Error("Invalid template type");
+      }
+    });
+    const templates = await Promise.all(_templates);
+    const sections = [];
+    for (let index in templates) {
+      const template = templates[index];
+      const titleSec = this.createTitle(actives[index]);
+      const tableSec = await this.createTable(template);
+      const docSec = {
+        properties: { type: DOCX.SectionType.NEXT_PAGE },
+        children: [titleSec, tableSec],
+      };
+      sections.push(docSec);
     }
-    const docSec = [titleSec, tableSec];
+    console.log("🚀templates:", templates);
     const doc = new DOCX.Document({
       styles,
-      sections: [
-        {
-          properties: { type: DOCX.SectionType.CONTINUOUS },
-          children: docSec,
-        },
-      ],
+      sections,
     });
     this.save(doc);
   }
+  convertForm(form, data) {
+    const rows = [];
+    let index = 0;
+    for (let item of form.data) {
+      if (!rows[index]) {
+        rows[index] = [];
+      }
+      // 换行
+      if (
+        rows[index].length === form.colSpan ||
+        rows[index][0]?.colSpan === form.colSpan
+      ) {
+        rows[++index] = [];
+      }
+      if ("label" in item) {
+        const label = { text: item.label, width: 20 };
+        const content = { text: data[item.prop], width: 20 };
+        rows[index].push(label, content);
+      } else if ("indent" in item) {
+        rows[index].push({
+          indent: item.indent,
+          text: data[item.prop],
+          colSpan: form.colSpan,
+        });
+      } else {
+        throw new Error("Invalid form item");
+      }
+    }
+    return { rows, ...form };
+  }
+  convertTable(table, data) {
+    const tableHeader = table.data.map((item) => ({
+      text: item.text,
+      width: item.width,
+    }));
+    const tableRows = data.map((item) =>
+      table.data.map((cell) => ({
+        text: item[cell.prop],
+        width: cell.width,
+      }))
+    );
+    return { rows: [tableHeader, ...tableRows], ...table };
+  }
 
-  createTitle(title) {
+  createTitle(active) {
     const TIT_TEXT = new DOCX.TextRun({
-      text: CONSTANTS.MAP[title],
+      text: CONSTANTS.MAP[active],
       color: "000000", // 文字颜色为黑色
       bold: true,
     });
     const TIT_PAR = new DOCX.Paragraph({
       children: [TIT_TEXT],
-      style: "pageTitle",
-      alignment: DOCX.AlignmentType.CENTER, // 文字居中
-      shading: {
-        type: DOCX.ShadingType.CLEAR, // 背景类型
-        color: "auto",
-        fill: "F7F7F7", // 背景颜色为 #f7f7f7
-      },
-      border: {
-        top: {
-          color: "F7F7F7",
-          size: 40,
-          space: 0,
-          style: DOCX.BorderStyle.SINGLE,
-        },
-        bottom: {
-          color: "F7F7F7",
-          size: 40,
-          space: 0,
-          style: DOCX.BorderStyle.SINGLE,
-        },
-      },
+      ...pageTitleStyle,
     });
     return TIT_PAR;
   }
-  async createTable(temp, data) {
-    const tempFn = CONSTANTS.TEMPLATES[temp];
-    let template = tempFn(data);
-    if (!tempFn || !template) return null;
+  async createTable(template) {
+    const columnWidths =
+      template.type === "FORM"
+        ? template.columnWidths
+        : template.data.map((i) => i.width);
+    const opt = {
+      columnWidths,
+    };
 
-    let rows;
-    if (template instanceof Promise) {
-      template = await template;
-    }
-    rows = this.handleTemplate(template);
+    const rows = await this.handleTemplate(template.rows);
     return new DOCX.Table({
       rows,
+      ...opt,
       width: {
-        size: 100,
-        type: DOCX.WidthType.PERCENTAGE,
+        size: 9010,
+        type: DOCX.WidthType.DXA,
       },
     });
   }
@@ -134,83 +124,100 @@ class DocumentCreator {
     });
   }
   // 生成段落
-  createParagraph(children, style = "cellParagraph") {
+  createParagraph(children, opt) {
     return new DOCX.Paragraph({
-      style,
+      style: opt.style ?? "cellParagraph",
+      ...opt,
       children,
     });
   }
   // 生成图片
   createImageRun(data, ratio, width = 572) {
-    return new DOCX.ImageRun({
-      data,
-      transformation: {
-        width,
-        height: width / ratio,
-      },
+    return new Promise((resolve, reject) => {
+      const testImg = require("@/assets/branchInfo.png");
+      convertImageToBase64(testImg, (imgData) => {
+        resolve(
+          new DOCX.ImageRun({
+            data: imgData.url,
+            transformation: {
+              width,
+              height: width / imgData.ratio,
+            },
+          })
+        );
+      });
     });
   }
   // 根据模板生成表单
-  handleTemplate(template) {
-    const rows = [];
-    for (let tableRow of template.tableRows) {
-      const row = [];
-      for (let tableCell of tableRow.tableCells) {
+  async handleTemplate(rows) {
+    const tableRows = [];
+    for (const rowIndex in rows) {
+      const row = rows[rowIndex];
+      const tableRow = [];
+      for (const cell of row) {
         const paragraph = [];
 
         // 表单内容的标题
-        if (tableCell.indentText) {
-          paragraph.push(this.createTextRun(tableCell.indentText));
+        if (cell.indent) {
+          paragraph.push(this.createTextRun(cell.indent));
         }
 
         // 单元格文字内容
-        if (tableCell.text) {
-          const opt = tableCell.indentText ? { break: 1 } : {};
-          paragraph.push(this.createTextRun(tableCell.text, opt));
+        if (cell.text) {
+          const opt = cell.indent ? { break: 1 } : {};
+          paragraph.push(this.createTextRun(cell.text, opt));
         }
 
         // 表单中的富文本
-        if (tableCell.html) {
+        if (cell.html) {
           // paragraph.push(new DOCX.TextRun(tableCell.richText));
         }
 
         // 表单中的图片
-        if (tableCell.img) {
-          paragraph.push(
-            this.createImageRun(tableCell.img.base64, tableCell.img.ratio)
-          );
+        if (cell.img) {
+          const img = await this.createImageRun(cell.img);
+          paragraph.push(img);
         }
-
         // 每个cell里套一层paragraph
-        const cell = this.createParagraph(paragraph);
+        const tableCell = this.createParagraph(paragraph, {
+          margins: {
+            top: 40,
+            bottom: 40,
+            right: 200,
+            left: 200,
+          },
+          shading:
+            rowIndex === "0"
+              ? {
+                  type: DOCX.ShadingType.CLEAR,
+                  color: "auto",
+                  fill: "F7F7F7",
+                }
+              : undefined,
+        });
 
         // 把一串cell放到一行row里
-        row.push(
+        tableRow.push(
           new DOCX.TableCell({
-            columnSpan: tableCell.colSpan ?? 1,
-            width: {
-              size: tableCell.width ?? 100,
-              type: DOCX.WidthType.PERCENTAGE,
-            },
-            // margins: {
-            //   top: 140,
-            //   bottom: 140,
-            //   right: 200,
-            //   left: 200,
-            // },
+            columnSpan: cell.colSpan ?? 1,
             verticalAlign: DOCX.VerticalAlign.CENTER,
             textDirection: DOCX.TextDirection.LEFT_TO_RIGHT_TOP_TO_BOTTOM,
-            children: [cell],
+            children: [tableCell],
           })
         );
       }
-      rows.push(
+      tableRows.push(
         new DOCX.TableRow({
-          children: row,
+          tableHeader: rowIndex === 0,
+          children: tableRow,
         })
       );
+      console.log(
+        "🚀 ~ DocumentCreator ~ handleTemplate ~ tableRows:",
+        tableRows
+      );
     }
-    return rows;
+    return tableRows;
   }
   save(doc) {
     DOCX.Packer.toBlob(doc)

@@ -84,9 +84,7 @@ export function convertImageToBase64(url, callback) {
     // 创建HTML Canvas元素
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    const width = image.width;
-    const height = image.height;
-    const ratio = width / height;
+    const ratio = this.naturalWidth / this.naturalHeight;
     canvas.height = this.naturalHeight;
     canvas.width = this.naturalWidth;
 
@@ -97,7 +95,7 @@ export function convertImageToBase64(url, callback) {
     const dataURL = canvas.toDataURL("image/jpeg");
 
     // 调用回调函数并传递Base64编码的字符串
-    callback({ base64: dataURL, width, height, ratio });
+    callback({ url: dataURL, ratio });
   };
 
   // 设置图片源
