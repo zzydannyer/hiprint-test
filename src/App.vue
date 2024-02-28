@@ -245,7 +245,7 @@ export default {
     },
   },
   created() {
-    this.getData();
+    // this.getData();
   },
   mounted() {
     // this.renderDoc();
@@ -668,10 +668,6 @@ export default {
       this.loading = true;
       setTimeout(() => {
         this.templateData = templateData;
-        // 党支部委员名单
-        this.templateData["党支部委员名单"] = [templateData["党支部委员名单"]];
-        this.templateData["党小组长名单"] = [templateData["党小组长名单"]];
-        this.templateData["党小组管理"] = [templateData["党小组管理"]];
         this.loading = false;
       }, 2000);
     },

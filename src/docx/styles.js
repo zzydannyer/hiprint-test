@@ -70,3 +70,15 @@ export const pageTitleStyle = {
     },
   },
 };
+
+export const sectionStyle = {
+  page: {
+    type: DOCX.SectionType.NEXT_PAGE,
+    margin: {
+      top: DOCX.convertMillimetersToTwip(24),
+      right: DOCX.convertMillimetersToTwip(24),
+      bottom: DOCX.convertMillimetersToTwip(24),
+      left: DOCX.convertMillimetersToTwip(24),
+    },
+  },
+};

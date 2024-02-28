@@ -2,43 +2,90 @@ import * as DOCX from "docx";
 import CONSTANTS from "@/utils/constants";
 import TEMP_DATA from "@/data";
 import { renderAsync } from "docx-preview";
-import styles, { pageTitleStyle } from "./styles";
+import styles, { pageTitleStyle, sectionStyle } from "./styles";
 import { saveAs } from "file-saver";
+import { cloneDeep } from "lodash";
 
 // import { Buffer } from "buffer";
 // window.Buffer = Buffer;
 
-const actives = ["branchInfo", "committeeLeader"];
+const actives = [
+  "branchInfo",
+  "committeeLeader",
+  // "groupLeader",
+  // "memberGroup",
+  // "formalMember",
+  // "memberTransfer",
+  // "help",
+  // "talk",
+  // "developMember",
+  // "branch",
+  // "brach",
+  // "orgLifeRecord",
+  // "lessonRecord",
+  // "plan",
+  // "summary",
+  // "deliberation",
+];
 class DocumentCreator {
   async create() {
-    const _templates = actives.map((active) => {
+    const DATA = this.processingData(TEMP_DATA);
+    console.log("🚀DATA:", TEMP_DATA, DATA);
+
+    const _pages = [];
+
+    for (let active of actives) {
       const temp = CONSTANTS.TEMPLATES[active];
       if (temp.type === "FORM") {
-        return this.convertForm(temp, TEMP_DATA[active]);
+        const formDatas = DATA[active];
+        for (let formData of formDatas) {
+          _pages.push(this.convertForm(temp, formData));
+        }
       } else if (temp.type === "TABLE") {
-        return this.convertTable(temp, TEMP_DATA[active]);
+        _pages.push(this.convertTable(temp, DATA[active]));
       } else {
         throw new Error("Invalid template type");
       }
-    });
-    const templates = await Promise.all(_templates);
+    }
+
+    const pages = await Promise.all(_pages);
     const sections = [];
-    for (let index in templates) {
-      const template = templates[index];
+
+    for (let index in pages) {
+      const sec = pages[index];
       const titleSec = this.createTitle(actives[index]);
-      const tableSec = await this.createTable(template);
+      const tableSec = await this.createTable(sec);
       const docSec = {
-        properties: { type: DOCX.SectionType.NEXT_PAGE },
+        properties: sectionStyle,
         children: [titleSec, tableSec],
       };
       sections.push(docSec);
     }
-    console.log("🚀templates:", templates);
+    console.log("🚀templates:", pages);
     const doc = new DOCX.Document({
       styles,
       sections,
     });
     this.save(doc);
+  }
+  // 数据处理
+  processingData(_data) {
+    const data = cloneDeep(_data);
+    // 把branchInfo转成数组
+    data.branchInfo = [_data.branchInfo];
+    // 处理党费
+    for (let i = 0; i < _data.partyDuesSummary.length; i++) {
+      let sum = 0;
+      const { name, datas } = _data.partyDuesSummary[i];
+      const item = datas.reduce((acc, cur) => {
+        sum += Number(cur.collectionMoney);
+        const month = cur.collectionMonth.split("-")[1];
+        acc[month] = cur.collectionMoney;
+        return acc;
+      }, {});
+      data.partyDuesSummary[i] = { name, sum, ...item };
+    }
+    return data;
   }
   convertForm(form, data) {
     const rows = [];
@@ -72,7 +119,7 @@ class DocumentCreator {
   }
   convertTable(table, data) {
     const tableHeader = table.data.map((item) => ({
-      text: item.text,
+      text: item.label,
       width: item.width,
     }));
     const tableRows = data.map((item) =>
@@ -105,13 +152,13 @@ class DocumentCreator {
       columnWidths,
     };
 
-    const rows = await this.handleTemplate(template.rows);
+    const rows = await this.handleTemplate(template.rows, template.type);
     return new DOCX.Table({
       rows,
       ...opt,
       width: {
-        size: 9010,
-        type: DOCX.WidthType.DXA,
+        size: 100,
+        type: DOCX.WidthType.AUTO,
       },
     });
   }
@@ -124,7 +171,7 @@ class DocumentCreator {
     });
   }
   // 生成段落
-  createParagraph(children, opt) {
+  createParagraph(children, opt = {}) {
     return new DOCX.Paragraph({
       style: opt.style ?? "cellParagraph",
       ...opt,
@@ -149,7 +196,7 @@ class DocumentCreator {
     });
   }
   // 根据模板生成表单
-  async handleTemplate(rows) {
+  async handleTemplate(rows, type) {
     const tableRows = [];
     for (const rowIndex in rows) {
       const row = rows[rowIndex];
@@ -179,22 +226,9 @@ class DocumentCreator {
           paragraph.push(img);
         }
         // 每个cell里套一层paragraph
-        const tableCell = this.createParagraph(paragraph, {
-          margins: {
-            top: 40,
-            bottom: 40,
-            right: 200,
-            left: 200,
-          },
-          shading:
-            rowIndex === "0"
-              ? {
-                  type: DOCX.ShadingType.CLEAR,
-                  color: "auto",
-                  fill: "F7F7F7",
-                }
-              : undefined,
-        });
+        const tableCell = this.createParagraph(paragraph);
+
+        const isTableHeader = type === "TABLE" && rowIndex === "0";
 
         // 把一串cell放到一行row里
         tableRow.push(
@@ -202,6 +236,19 @@ class DocumentCreator {
             columnSpan: cell.colSpan ?? 1,
             verticalAlign: DOCX.VerticalAlign.CENTER,
             textDirection: DOCX.TextDirection.LEFT_TO_RIGHT_TOP_TO_BOTTOM,
+            margins: {
+              top: 40,
+              bottom: 40,
+              right: 200,
+              left: 200,
+            },
+            shading: isTableHeader
+              ? {
+                  type: DOCX.ShadingType.CLEAR,
+                  color: "auto",
+                  fill: "F7F7F7",
+                }
+              : undefined,
             children: [tableCell],
           })
         );
@@ -211,10 +258,6 @@ class DocumentCreator {
           tableHeader: rowIndex === 0,
           children: tableRow,
         })
-      );
-      console.log(
-        "🚀 ~ DocumentCreator ~ handleTemplate ~ tableRows:",
-        tableRows
       );
     }
     return tableRows;
