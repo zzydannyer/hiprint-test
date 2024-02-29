@@ -16,7 +16,7 @@ export default {
       run: {
         color: "000000",
         bold: true,
-        size: 32,
+        size: 18,
       },
       paragraph: {
         spacing: {
@@ -32,15 +32,17 @@ export default {
       next: "Normal",
       run: {
         color: "000000",
-        size: 20,
+        size: 14,
       },
       paragraph: {
         spacing: {
-          line: 276,
-          before: 140,
-          after: 140,
-          left: 200,
-          right: 200,
+          after: 140, // 下边距
+          before: 140, // 上边距
+          line: 200, // 行间距，可用于调整文本之间的距离
+        },
+        indent: {
+          left: 140, // 左边距
+          right: 140, // 右边距
         },
       },
     },
@@ -74,11 +76,11 @@ export const pageTitleStyle = {
 export const sectionStyle = {
   page: {
     type: DOCX.SectionType.NEXT_PAGE,
-    margin: {
-      top: DOCX.convertMillimetersToTwip(24),
-      right: DOCX.convertMillimetersToTwip(24),
-      bottom: DOCX.convertMillimetersToTwip(24),
-      left: DOCX.convertMillimetersToTwip(24),
-    },
+    // margin: {
+    //   top: DOCX.convertMillimetersToTwip(24),
+    //   right: DOCX.convertMillimetersToTwip(24),
+    //   bottom: DOCX.convertMillimetersToTwip(24),
+    //   left: DOCX.convertMillimetersToTwip(24),
+    // },
   },
 };

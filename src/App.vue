@@ -4,7 +4,7 @@
     <el-button type="primary" @click="docxPlugin">点击docxPlugin</el-button>
     <el-button type="primary" @click="docxCore">点击docxCore</el-button>
     <div id="bodyContainer"></div>
-    <div v-html="HTMLString.text"></div>
+    <!-- <div v-html="HTMLString.text"></div> -->
     <!-- :style="{
       width: `${page.width + 2}px`,
       minHeight: `${page.height + 2}px`,
@@ -99,6 +99,446 @@
     </div> -->
     <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
     <!-- <CanvasEditor /> -->
+
+    <p>
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 机关党支部2023年工作任务清单
+    </p>
+    \r\n\r\n
+    <table border="1" cellpadding="0" cellspacing="0" style="width: 949px">
+      \r\n\t
+      <thead>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <th style="height: 21px; width: 32px">
+            \r\n\t\t\t
+            <p>序号</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th style="height: 21px; width: 84px">
+            \r\n\t\t\t
+            <p>重点内容</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th style="height: 21px; width: 104px">
+            \r\n\t\t\t
+            <p>主要工作</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th style="height: 21px; width: 520px">
+            \r\n\t\t\t
+            <p>具体措施</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th style="height: 21px; width: 84px">
+            \r\n\t\t\t
+            <p>时间进度</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th style="height: 21px; width: 122px">
+            \r\n\t\t\t
+            <p>责任人</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t
+        </tr>
+        \r\n\t
+      </thead>
+      \r\n\t
+      <tbody>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td rowspan="3" style="height: 36px; width: 32px">
+            \r\n\t\t\t
+            <p>一</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td rowspan="3" style="height: 36px; width: 84px">
+            \r\n\t\t\t
+            <p>抓好政治理论学习教育，不断筑牢党员队伍思想根基</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 36px; width: 104px">
+            \r\n\t\t\t
+            <p>守牢政治纪律和政治规矩</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 36px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              教育引导全体党员、干部始终在政治立场、政治方向、政治原则、政治道路上同以习近平同志为核心的党中央保持高度一致，深刻领悟&ldquo;两个确立&rdquo;的决定性意义，坚决做到&ldquo;两个维护&rdquo;，不折不扣贯彻落实党的路线方针政策和党中央重大决策部署以及上级党组织的部署安排，对照集团巡察问题反馈清单，高标准落实党支部整改工作。
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td rowspan="13" style="height: 36px; width: 84px">
+            \r\n\t\t\t
+            <p>全年</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td rowspan="2" style="height: 36px; width: 122px">
+            \r\n\t\t\t
+            <p>支部班子成员</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td style="height: 23px; width: 104px">
+            \r\n\t\t\t
+            <p>深入学习贯彻党的二十大精神</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 23px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              把学习宣传贯彻党的二十大精神作为当前和今后一个时期首要的政治任务抓实抓牢，根据公司党委学习要求，制定党支部学习计划，将全体党员的思想和行动统一到党的二十大精神上来。坚持学以致用，结合实际，努力把学习成果转化为推动公司发展的实际成效。
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td style="height: 39px; width: 104px">
+            \r\n\t\t\t
+            <p>深入学习党章党规党纪</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 39px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              以学习新党章为抓手，坚决维护党章权威，遵守党的纪律，准则、条例、规则等党内法规，敢于斗争、善于斗争，牢固树立遵规守纪的意识，
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 39px; width: 122px">
+            \r\n\t\t\t
+            <p>支部班子成员</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td rowspan="3" style="height: 34px; width: 32px">
+            \r\n\t\t\t
+            <p>二</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td rowspan="3" style="height: 34px; width: 84px">
+            \r\n\t\t\t
+            <p>着力强化党建责任，不断提高党支部规范化建设水平</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 34px; width: 104px">
+            \r\n\t\t\t
+            <p>严格落实党建工作责任制</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 34px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              根据集团《党支部规范化建设实施细则》和党建目标责任制考核要求，加强季度自查自纠，及时维护支部目视管理内容和党建平台数据信息，查缺补漏，落实落细党建目标责任制各项工作要求。
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 34px; width: 122px">
+            \r\n\t\t\t
+            <p>党支部书记</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td style="height: 37px; width: 104px">
+            \r\n\t\t\t
+            <p>严格执行各项组织制度</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 37px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              重点执行落实好&ldquo;三会一课&rdquo;、党员领导干部双重组织生活、民主评议党员等基本制度。严格按照规范程序，开展党支部换届选举工作。充分运用市内红色资源，组织党员参观见学、观摩红色电影，进一步丰富党支部主题党日形式和内容，提高组织生活质量
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td rowspan="2" style="height: 37px; width: 122px">
+            \r\n\t\t\t
+            <p>支部班子成员</p>
+            \r\n\r\n\t\t\t
+            <p>各党小组长</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td style="height: 36px; width: 104px">
+            \r\n\t\t\t
+            <p>严格队伍管理</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 36px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              围绕服务生产，结合党小组活动、志愿服务、党员培训等形式，强化党员教育管理，落实党员积分制制度和32学时集中学习培训制度，严格落实&ldquo;学习强国&rdquo;、集团党建网学习要求。加强党员8小时外的教育监督管理，引导党员时刻牢记身份，做遵规守纪的表率。落实好党员发展要求，上半年，完成2名发展对象的发展工作，继续加强1名入党积极份子的培养和考察工作，进一步充实优化党员队伍。
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td rowspan="2" style="height: 22px; width: 32px">
+            \r\n\t\t\t
+            <p>三</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td rowspan="2" style="height: 22px; width: 84px">
+            \r\n\t\t\t
+            <p>积极融入中心、服务中心，不断提高服务保障能力</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 22px; width: 104px">
+            \r\n\t\t\t
+            <p>深入推进党建融合</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 22px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              围绕公司生产经营重点工作，组织党员干部积极开展立功竞赛、党员先锋岗等活动。把握引领、保障、服务三个环节，将党建力转化为推动公司发展的生产力，深刻融入生产经营中心工作。
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 22px; width: 122px">
+            \r\n\t\t\t
+            <p>支部班子成员</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td style="height: 38px; width: 104px">
+            \r\n\t\t\t
+            <p>增强服务保障的驱动力</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 38px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              聚焦日常工作中的难点和瓶颈问题，以集团、公司党员攻坚行动、生产立功竞赛、评优评先活动等为抓手，不断激发党员引领示范效应和服务保障作用，助力公司生产保障。注重发挥支委班子的合力作用，以点带面促进支部建设整体提升，为公司各项生产经营目标的顺利实现提供保障。
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 38px; width: 122px">
+            \r\n\t\t\t
+            <p>支部班子成员</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t
+      </tbody>
+      \r\n\t
+      <thead>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <th rowspan="2" style="height: 19px; width: 32px">
+            \r\n\t\t\t
+            <p>四</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th rowspan="2" style="height: 19px; width: 84px">
+            \r\n\t\t\t
+            <p>持续推进党风廉政建设，不断强化党员纪律意识</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th style="height: 19px; width: 104px">
+            \r\n\t\t\t
+            <p>严格执行党风廉政责任制</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th style="height: 19px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              根据公司党风廉政建设年度工作要点和责任清单，认真开展党支部党风廉政建设责任分工。调整梳理党支部&ldquo;三级预控网络&rdquo;责任人队伍和廉洁风险预控源，细化预控措施。加强&ldquo;三检查一评议&rdquo;季度工作，以关键岗位为人员为主要对象，组织签订《廉洁承诺书》，严格落实廉洁从业季度报告制度，加强警示教育，促进廉洁从业。
+            </p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th style="height: 19px; width: 122px">
+            \r\n\t\t\t
+            <p>党支部书记</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t
+        </tr>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <th style="height: 46px; width: 104px">
+            \r\n\t\t\t
+            <p>持续改进作风</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th style="height: 46px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              认真学习和落实公司关于加强党员干部作风建设的措施和要求，结合巡察整改、领导人员作风纪律专项整治教育和党风廉政教育月活动等，进一步加强党员干部作风教育，强化主动担当的意识，不断提高工作执行力，不折不扣落实好上级决策部署和工作要求，提高工作成效。
+            </p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t\t
+          <th style="height: 46px; width: 122px">
+            \r\n\t\t\t
+            <p>支部班子成员</p>
+            \r\n\t\t\t
+          </th>
+          \r\n\t\t
+        </tr>
+        \r\n\t
+      </thead>
+      \r\n\t
+      <tbody>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td rowspan="3" style="height: 34px; width: 32px">
+            \r\n\t\t\t
+            <p>五</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td rowspan="3" style="height: 34px; width: 84px">
+            \r\n\t\t\t
+            <p>坚持服务职工群众，不断促进和谐发展</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 34px; width: 104px">
+            \r\n\t\t\t
+            <p>关心关爱职工群众</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 34px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              以公司&ldquo;三会&rdquo;、厂情发布会、领导人员双重组织生活会等为抓手，加强形势任务宣传教育，凝聚职工思想共识。经常关心职工思想、工作和生活情况，加大关怀帮扶力度，积极开展帮困送温暖和家访慰问工作，了解掌握职工及家庭实际状况，稳妥化解和处理不稳定因素，稳定职工队伍。
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 34px; width: 122px">
+            \r\n\t\t\t
+            <p>支部班子成员</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td style="height: 38px; width: 104px">
+            \r\n\t\t\t
+            <p>积极构建和谐家园</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 38px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              结合公司徒步走、周年庆等活动，适时组织开展形式多样职工文体活动，进一步丰富活动形式和内容。同时进一步做实服务职工实事项目，坚持做好劳动安全、防寒保暖、防暑降温等职工劳动保护工作。协助公司积极开展上海市文明单位创建工作，进一步提升企业良好形象和职工文明素养。
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 38px; width: 122px">
+            \r\n\t\t\t
+            <p>支部班子成员</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t\t
+        <tr>
+          \r\n\t\t\t
+          <td style="height: 38px; width: 104px">
+            \r\n\t\t\t
+            <p>大力支持团青工作</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 38px; width: 520px">
+            \r\n\t\t\t
+            <p>
+              坚持贯彻党建带团建的要求，认真落实公司加强群团工作的要求，加强党对群团工作的领导，进一步增强群团组织的生机活力，发挥群团组织的优势，更好地促进公司生产发展。
+            </p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t\t
+          <td style="height: 38px; width: 122px">
+            \r\n\t\t\t
+            <p>支部班子成员</p>
+            \r\n\t\t\t
+          </td>
+          \r\n\t\t
+        </tr>
+        \r\n\t
+      </tbody>
+      \r\n
+    </table>
+    \r\n\r\n
+    <p>&nbsp;</p>
+    \r\n
   </div>
 </template>
 

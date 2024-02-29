@@ -1,5 +1,3 @@
-import { convertImageToBase64 } from "./index.js";
-
 const SIZE = {
   WIDTH: 794,
   HEIGHT: 1123,
@@ -896,6 +894,7 @@ const TEMPLATES = {
 const TEMPLATES2 = {
   // 支部情况
   branchInfo: {
+    title: "支部情况",
     type: "FORM",
     colSpan: 2,
     data: [
@@ -903,95 +902,104 @@ const TEMPLATES2 = {
       { indent: "支部介绍", prop: "introduce", type: "text" },
       { indent: "照片", prop: "img", type: "img" },
     ],
-    columnWidths: [3505, 5505],
+    columnWidths: [20, 80],
   },
   // 党支部委员名单
   committeeLeader: {
+    title: "党支部委员名单",
     type: "TABLE",
     data: [
-      { label: "姓名", prop: "memberName", width: 2252 },
-      { label: "岗位职务", prop: "adminPost", width: 2252 },
-      { label: "入党时间", prop: "joinDate", width: 2252 },
-      { label: "分工内容", prop: "workDep", width: 2252 },
+      { label: "姓名", prop: "memberName" },
+      { label: "岗位职务", prop: "adminPost" },
+      { label: "入党时间", prop: "joinDate" },
+      { label: "分工内容", prop: "workDep" },
     ],
   },
   // 党小组长名单
   groupLeader: {
+    title: "党小组长名单",
     type: "TABLE",
     data: [
-      { label: "姓名", prop: "memberName", width: 2252 },
-      { label: "岗位职务", prop: "adminPost", width: 2252 },
-      { label: "入党时间", prop: "joinDate", width: 2252 },
-      { label: "分工内容", prop: "workDep", width: 2252 },
+      { label: "姓名", prop: "memberName" },
+      { label: "岗位职务", prop: "adminPost" },
+      { label: "入党时间", prop: "joinDate" },
+      { label: "分工内容", prop: "workDep" },
     ],
   },
   // 党小组管理
   memberGroup: {
+    title: "党小组管理",
     type: "TABLE",
     data: [
-      { label: "小组名称", prop: "groupName", width: 2252 },
-      { label: "负责人", prop: "leader", width: 2252 },
+      { label: "小组名称", prop: "groupName" },
+      { label: "负责人", prop: "leader" },
     ],
   },
   // 党员名册
   formalMember: {
+    title: "党员名册",
     type: "TABLE",
     data: [
-      { label: "党员姓名", prop: "memberName", width: 2252 },
-      { label: "性别", prop: "sex", width: 2252 },
-      { label: "出生年月", prop: "birthday", width: 2252 },
-      { label: "入党时间", prop: "joinDate", width: 2252 },
-      { label: "学历", prop: "edu", width: 2252 },
-      { label: "党内分工", prop: "adminPost", width: 2252 },
-      { label: "所属党支部", prop: "orgName", width: 2252 },
-      { label: "所属党小组", prop: "groupName", width: 2252 },
+      { label: "党员姓名", prop: "memberName" },
+      { label: "性别", prop: "sex" },
+      { label: "出生年月", prop: "birthday" },
+      { label: "入党时间", prop: "joinDate" },
+      { label: "学历", prop: "edu" },
+      { label: "党内分工", prop: "adminPost" },
+      { label: "所属党支部", prop: "orgName" },
+      { label: "所属党小组", prop: "groupName" },
     ],
   },
   // 党员调动记录
   memberTransfer: {
+    title: "党员调动记录",
     type: "TABLE",
     data: [
-      { label: "党员姓名", prop: "memberName", width: 2252 },
-      { label: "由何处调出", prop: "outOrgName", width: 2252 },
-      { label: "由何处调⼊", prop: "inOrgName", width: 2252 },
-      { label: "调出⽇期", prop: "outDate", width: 2252 },
-      // { label: "调⼊⽇期", prop: "没有", width: 2252 },
+      { label: "党员姓名", prop: "memberName" },
+      { label: "由何处调出", prop: "outOrgName" },
+      { label: "由何处调⼊", prop: "inOrgName" },
+      { label: "调出⽇期", prop: "outDate" },
+      // { label: "调⼊⽇期", prop: "没有" },
     ],
   },
   // 帮困记录
   help: {
+    title: "帮困记录",
     type: "TABLE",
     data: [
-      { label: "姓名", prop: "helpName", width: 2252 },
-      { label: "性别", prop: "sex", width: 2252 },
-      { label: "政治面貌", prop: "zzmm", width: 2252 },
-      { label: "困难情况", prop: "poorSitu", width: 2252 },
+      { label: "姓名", prop: "helpName" },
+      { label: "性别", prop: "sex" },
+      { label: "政治面貌", prop: "zzmm" },
+      { label: "困难情况", prop: "poorSitu" },
     ],
   },
   // 谈心谈话
   talk: {
+    title: "谈心谈话",
     type: "TABLE",
     data: [
-      { label: "姓名", prop: "helpName", width: 2252 },
-      { label: "性别", prop: "sex", width: 2252 },
-      { label: "政治面貌", prop: "zzmm", width: 2252 },
-      { label: "谈话时间", prop: "talkTime", width: 2252 },
-      { label: "困难情况", prop: "poorSitu", width: 2252 },
+      { label: "姓名", prop: "helpName" },
+      { label: "性别", prop: "sex" },
+      { label: "政治面貌", prop: "zzmm" },
+      { label: "谈话时间", prop: "talkTime" },
+      { label: "困难情况", prop: "poorSitu" },
     ],
   },
   // 发展党员
   developMember: {
+    title: "发展党员",
     type: "TABLE",
     data: [
-      { label: "党员姓名", prop: "memberName", width: 2252 },
-      { label: "所属党⽀部", prop: "orgName", width: 2252 },
-      { label: "所属党⼩组", prop: "groupName", width: 2252 },
-      { label: "出⽣⽇期", prop: "birthday", width: 2252 },
-      { label: "⼈员阶段", prop: "status", width: 2252, dict: "statusMap" },
+      { label: "党员姓名", prop: "memberName" },
+      { label: "所属党⽀部", prop: "orgName" },
+      { label: "所属党⼩组", prop: "groupName" },
+      { label: "出⽣⽇期", prop: "birthday" },
+      { label: "⼈员阶段", prop: "status", dict: "statusMap" },
     ],
   },
   // 党支部大会记录
   branch: {
+    title: "党支部大会记录",
     type: "FORM",
     colSpan: 4,
     data: [
@@ -1001,21 +1009,23 @@ const TEMPLATES2 = {
       { label: "主持人", prop: "hoster", type: "text" },
       { label: "记录⼈", prop: "recorder", type: "text" },
       { indent: "会议记录：", prop: "detail", type: "text" },
-      { label: "备注", prop: "", type: "null" },
+      // { label: "备注", prop: "", type: "null", colSpan: 3 },
     ],
     columnWidths: [1505, 2000, 2505, 3000],
   },
   // 党支委会会议
   brach: {
+    title: "党支委会会议",
     type: "TABLE",
     data: [
-      { label: "⽇期", prop: "actualDate", width: 2252 },
-      { label: "出席⼈员（签名）", prop: "attenders", width: 2252 },
-      { label: "会议主要议题", prop: "detail", width: 2252 },
+      { label: "⽇期", prop: "actualDate" },
+      { label: "出席⼈员（签名）", prop: "attenders" },
+      { label: "会议主要议题", prop: "detail" },
     ],
   },
   // 党小组会议
   orgLifeRecord: {
+    title: "党小组会议",
     type: "FORM",
     colSpan: 4,
     data: [
@@ -1025,12 +1035,13 @@ const TEMPLATES2 = {
       { label: "主持人", prop: "hoster", type: "text" },
       { label: "记录⼈", prop: "recorder", type: "text" },
       { indent: "会议记录：", prop: "detail", type: "text" },
-      { label: "备注", prop: "", type: "null" },
+      // { label: "备注", prop: "", type: "null", colSpan: 3 },
     ],
     columnWidths: [1505, 2000, 2505, 3000],
   },
   // 党课记录
   lessonRecord: {
+    title: "党课记录",
     type: "FORM",
     colSpan: 4,
     data: [
@@ -1040,7 +1051,7 @@ const TEMPLATES2 = {
       // { label: "主持人", prop: "无此字段", type: "text" },
       // { label: "记录⼈", prop: "无此字段", type: "text" },
       { indent: "会议记录：", prop: "detail", type: "html" },
-      { label: "备注", prop: "", type: "null" },
+      // { label: "备注", prop: "", type: "null", colSpan: 3 },
     ],
     columnWidths: [1505, 2000, 2505, 3000],
   },
@@ -1061,6 +1072,7 @@ const TEMPLATES2 = {
   // },
   // 支部年度工作计划
   plan: {
+    title: "支部年度工作计划",
     type: "FORM",
     colSpan: 2,
     data: [
@@ -1072,37 +1084,40 @@ const TEMPLATES2 = {
   },
   // 支部年度工作总结
   summary: {
+    title: "支部年度工作总结",
     type: "FORM",
     colSpan: 2,
     data: [
       { label: "标题", prop: "title", type: "text" },
       { label: "年度", prop: "year", type: "text" },
-      { indent: "会议记录：", prop: "summaryDetail", type: "text" },
+      { indent: "会议记录：", prop: "summaryDetail", type: "html" },
     ],
     columnWidths: [3505, 5505],
   },
   // 党费 数据结构待处理
   partyDuesSummary: {
+    title: "党费",
     type: "TABLE",
     data: [
-      { label: "党组织", prop: "name", width: 200 },
-      { label: "1月", prop: "01", width: 200 },
-      { label: "2月", prop: "02", width: 200 },
-      { label: "3月", prop: "03", width: 200 },
-      { label: "4月", prop: "04", width: 200 },
-      { label: "5月", prop: "05", width: 200 },
-      { label: "6月", prop: "06", width: 200 },
-      { label: "7月", prop: "07", width: 200 },
-      { label: "8月", prop: "08", width: 200 },
-      { label: "9月", prop: "09", width: 200 },
-      { label: "10月", prop: "10", width: 200 },
-      { label: "11月", prop: "11", width: 200 },
-      { label: "12月", prop: "12", width: 200 },
-      { label: "小计", prop: "summary", width: 200 },
+      { label: "党组织", prop: "name" },
+      { label: "1月", prop: "01" },
+      { label: "2月", prop: "02" },
+      { label: "3月", prop: "03" },
+      { label: "4月", prop: "04" },
+      { label: "5月", prop: "05" },
+      { label: "6月", prop: "06" },
+      { label: "7月", prop: "07" },
+      { label: "8月", prop: "08" },
+      { label: "9月", prop: "09" },
+      { label: "10月", prop: "10" },
+      { label: "11月", prop: "11" },
+      { label: "12月", prop: "12" },
+      { label: "小计", prop: "summary" },
     ],
   },
   // 党员民主评议管理
   deliberation: {
+    title: "党员民主评议管理",
     type: "FORM",
     colSpan: 4,
     data: [
