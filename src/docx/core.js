@@ -1,5 +1,5 @@
 import * as DOCX from "docx";
-import CONSTANTS from "@/utils/constants";
+import CONSTANTS, { compatibility } from "@/utils/constants";
 import TEMP_DATA from "@/data";
 import { renderAsync } from "docx-preview";
 import styles, { pageTitleStyle, sectionStyle } from "./styles";
@@ -10,23 +10,23 @@ import { convertImageToBase64 } from "@/utils";
 // window.Buffer = Buffer;
 
 const actives = [
-  // "branchInfo",
-  // "committeeLeader",
-  // "groupLeader",
-  // "memberGroup",
-  // "formalMember",
-  // "memberTransfer",
-  // "help",
-  // "talk",
-  // "developMember",
-  // "branch",
-  // "brach",
-  // "orgLifeRecord",
-  // "lessonRecord",
+  "branchInfo",
+  "committeeLeader",
+  "groupLeader",
+  "memberGroup",
+  "formalMember",
+  "memberTransfer",
+  "help",
+  "talk",
+  "developMember",
+  "branch",
+  "brach",
+  "orgLifeRecord",
+  "lessonRecord",
   "plan",
-  // "summary",
-  // "partyDuesSummary",
-  // "deliberation",
+  "summary",
+  "partyDuesSummary",
+  "deliberation",
 ];
 class DocumentCreator {
   async create() {
@@ -52,21 +52,62 @@ class DocumentCreator {
     for (let sec of pages) {
       const titleSec = this.createTitle(sec.title);
       const tableSec = await this.createTable(sec);
-      const x = {
+      const LANDSCAPE = {
         page: {
           margin: {
-            left: 10,
-            right: 10,
+            size: {
+              orientation: DOCX.PageOrientation.LANDSCAPE,
+            },
           },
         },
       };
+      // 页眉
+      const headers = {
+        default: new DOCX.Header({
+          children: [
+            new DOCX.Paragraph({
+              alignment: DOCX.AlignmentType.CENTER,
+              children: [
+                new DOCX.TextRun({
+                  text: sec.title,
+                  bold: true,
+                }),
+              ],
+            }),
+          ],
+        }),
+      };
+      // 页脚
+      const footers = {
+        default: new DOCX.Footer({
+          children: [
+            new DOCX.Paragraph({
+              alignment: DOCX.AlignmentType.CENTER,
+              children: [
+                new DOCX.TextRun({
+                  children: [
+                    DOCX.PageNumber.CURRENT,
+                    "/",
+                    DOCX.PageNumber.TOTAL_PAGES,
+                  ],
+                  bold: true,
+                }),
+              ],
+            }),
+          ],
+        }),
+      };
       const docSec = {
-        properties: sec.title === "党费" ? x : sectionStyle,
+        properties: sec.title === "党费" ? LANDSCAPE : sectionStyle,
+        headers,
+        footers,
         children: [titleSec, tableSec],
       };
       sections.push(docSec);
     }
     const doc = new DOCX.Document({
+      // 兼容性
+      compatibility,
       styles,
       sections,
     });
@@ -163,16 +204,26 @@ class DocumentCreator {
         : template.data.map((i) => i.width);
     const opt = {
       // columnWidths,
+      margins: {
+        top: 100,
+        bottom: 100,
+        left: 100,
+        right: 100,
+      },
+      width: {
+        size: 9010,
+        type: DOCX.WidthType.DXA,
+      },
+      indent: {
+        size: 100,
+        type: DOCX.WidthType.DXA,
+      },
     };
 
     const rows = await this.handleTemplate(template.rows, template.type);
     return new DOCX.Table({
       rows,
       ...opt,
-      width: {
-        size: 100,
-        type: DOCX.WidthType.PERCENTAGE,
-      },
     });
   }
 
@@ -214,6 +265,7 @@ class DocumentCreator {
     for (const rowIndex in rows) {
       const row = rows[rowIndex];
       const tableRow = [];
+      const isTableHeader = type === "TABLE" && rowIndex === "0";
       for (const cell of row) {
         const paragraph = [];
 
@@ -235,8 +287,9 @@ class DocumentCreator {
 
         // 表单中的富文本
         if (cell.type === "html") {
+          let htmString = cell.text.replace(/[\t\n\r]/g, "");
           const htmlDOM = new DOMParser().parseFromString(
-            cell.text,
+            htmString,
             "text/html"
           );
           const DOMContent = htmlDOM.body;
@@ -249,9 +302,6 @@ class DocumentCreator {
           const img = await this.createImageRun(cell.text);
           tableCell.push(this.createParagraph([img]));
         }
-
-        const isTableHeader = type === "TABLE" && rowIndex === "0";
-
         // 把一串cell放到一行row里
         tableRow.push(
           new DOCX.TableCell({
@@ -277,27 +327,12 @@ class DocumentCreator {
       }
       tableRows.push(
         new DOCX.TableRow({
-          tableHeader: rowIndex === 0,
+          tableHeader: isTableHeader,
           children: tableRow,
         })
       );
     }
     return tableRows;
-  }
-  cleanText(text) {
-    // 替换 &nbsp; 为普通空格
-    let cleanedText = text.replace(/&nbsp;/g, " ");
-
-    // 可选: 根据需要处理 \n 和 \t，例如，将 \t 替换为四个空格
-    cleanedText = cleanedText.replace(/\t/g, "    ");
-
-    // 忽略 \r，因为它在HTML渲染中不起作用
-    cleanedText = cleanedText.replace(/\r/g, "");
-
-    // 删除连续的空格（包括替换制表符后的空格）
-    cleanedText = cleanedText.replace(/\s+/g, " ").trim();
-
-    return cleanedText;
   }
   HTML2DocxConfig(element) {
     let docxElements = [];
@@ -306,44 +341,23 @@ class DocumentCreator {
       fontSize: 14, // 字体大小
       cellMargin: 60, // 单元格边距
       lineSpacing: 120, // 行间距
-      paragraphSpacing: 100, // 段落间距
+      paragraphSpacing: 40, // 段落间距
     };
 
     function processParagraph(pElement) {
-      const cleanedText = pElement.textContent;
       return new DOCX.Paragraph({
-        text: cleanedText,
+        text: pElement.textContent,
         style: "cellParagraph",
-        // alignment: DOCX.AlignmentType.CENTER,
-        paragraph: {
-          spacing: {
-            after: styleConfig.paragraphSpacing, // 段落后间距
-          },
-        },
-        run: {
-          size: styleConfig.fontSize,
-          spacing: styleConfig.lineSpacing, // 设置行间距
-        },
       });
     }
 
     function processCell(cellElement) {
-      const cleanedText = that.cleanText(cellElement.textContent);
       const paragraph = new DOCX.Paragraph({
-        text: cleanedText,
+        text: cellElement.textContent,
         style: "cellParagraph",
-        run: {
-          size: styleConfig.fontSize,
-        },
       });
       const cellOptions = {
         children: [paragraph],
-        // margins: {
-        //   top: styleConfig.cellMargin,
-        //   bottom: styleConfig.cellMargin,
-        //   left: styleConfig.cellMargin,
-        //   right: styleConfig.cellMargin,
-        // },
         verticalAlign: DOCX.VerticalAlign.CENTER,
       };
 
@@ -395,16 +409,13 @@ class DocumentCreator {
     }
 
     function traverseElements(element) {
-      if (element.tagName) {
-        processElement(element);
-      }
-      if (element.children) {
-        Array.from(element.children).forEach(traverseElements);
+      for (let e of element.children) {
+        if (e.tagName) {
+          processElement(e);
+        }
       }
     }
-
     traverseElements(element); // 从给定的根元素开始遍历
-
     return docxElements;
   }
 
@@ -413,7 +424,11 @@ class DocumentCreator {
       .then((blob) => {
         saveAs(blob, "2023党支部套打文档.docx");
         renderAsync(blob, document.getElementById("bodyContainer"), null, {
+          inWrapper: false,
           ignoreLastRenderedPageBreak: false,
+          experimental: true,
+          renderChanges: true,
+          debug: true,
         });
       })
       .catch(console.error);

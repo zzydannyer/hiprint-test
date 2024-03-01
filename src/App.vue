@@ -3,6 +3,7 @@
     <!-- <el-button type="primary" @click="html2docx">点击html2docx</el-button> -->
     <el-button type="primary" @click="docxPlugin">点击docxPlugin</el-button>
     <el-button type="primary" @click="docxCore">点击docxCore</el-button>
+    <el-button type="primary" @click="printByPrintPartial">点击打印</el-button>
     <div id="bodyContainer"></div>
     <!-- <div v-html="HTMLString.text"></div> -->
     <!-- :style="{
@@ -99,7 +100,6 @@
     </div> -->
     <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
     <!-- <CanvasEditor /> -->
-
     <p>
       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
@@ -572,7 +572,7 @@ import {
   ImageRun,
   WidthType,
 } from "docx";
-
+import { printPartial } from "@/utils";
 import CanvasEditor from "./components/CanvasEditor.vue";
 
 // window.Buffer = Buffer;
@@ -692,6 +692,14 @@ export default {
     // this.docxPlugin();
   },
   methods: {
+    printByPrintPartial() {
+      const element = document.getElementById("bodyContainer");
+      const year = new Date().getFullYear();
+      printPartial(element, {
+        title: "党支部" + year + "套打",
+        mode: this.mode,
+      });
+    },
     docxCore() {
       const page = new DocumentCreator();
       page.create();
@@ -784,6 +792,8 @@ export default {
       const match = base64String.match(/^data:image\/png;base64,(.*)$/);
       const base64Data = match ? match[1] : null;
 
+      const html = HTMLString.text.replace(/[\t\n\r\s]/g, "");
+
       // const doc = new Document({
       //   sections: [
       //     {
@@ -853,11 +863,8 @@ export default {
       //     },
       //   ],
       // });
-      const htmlDOM = new DOMParser().parseFromString(
-        HTMLString.text,
-        "text/html"
-      );
-      const DOMContent = htmlDOM.body.firstChild;
+      const htmlDOM = new DOMParser().parseFromString(html, "text/html");
+      const DOMContent = htmlDOM.body;
       const docxConfig = this.HTML2DocxConfig(DOMContent);
       const doc = new Document({
         sections: [

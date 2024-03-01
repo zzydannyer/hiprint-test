@@ -7977,7 +7977,7 @@ export default {
       summaryPublishDate: null,
       isActive: "1",
     },
-    /*   {
+    {
       searchValue: null,
       uid: "3194",
       creatorUid: "253",
@@ -8176,6 +8176,6 @@ export default {
       planPublishDate: "2019-05-24 00:00:00",
       summaryPublishDate: null,
       isActive: "1",
-    }, */
+    },
   ],
 };
