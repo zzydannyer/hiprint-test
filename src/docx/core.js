@@ -6,27 +6,30 @@ import styles, { pageTitleStyle, sectionStyle } from "./styles";
 import { saveAs } from "file-saver";
 import { cloneDeep } from "lodash";
 import { convertImageToBase64 } from "@/utils";
+import { dictsMap } from "@/utils/constants";
 // import { Buffer } from "buffer";
 // window.Buffer = Buffer;
-
+const 单位 = "明东公司工程技术部党总支-工程技术部综合设施组党支部";
+const 党支部 = "明东公司工程技术部党总支-工程技术部综合设施组党支部";
+const wrapTextNum = 14;
 const actives = [
   "branchInfo",
-  "committeeLeader",
-  "groupLeader",
-  "memberGroup",
-  "formalMember",
-  "memberTransfer",
-  "help",
-  "talk",
-  "developMember",
-  "branch",
-  "brach",
-  "orgLifeRecord",
-  "lessonRecord",
-  "plan",
-  "summary",
-  "partyDuesSummary",
-  "deliberation",
+  // "committeeLeader",
+  // "groupLeader",
+  // "memberGroup",
+  // "formalMember",
+  // "memberTransfer",
+  // "help",
+  // "talk",
+  // "developMember",
+  // "branch",
+  // "brach",
+  // "orgLifeRecord",
+  // "lessonRecord",
+  // "plan",
+  // "summary",
+  // "partyDuesSummary",
+  // "deliberation",
 ];
 class DocumentCreator {
   async create() {
@@ -49,15 +52,153 @@ class DocumentCreator {
     const pages = await Promise.all(_pages);
     const sections = [];
 
+    const frontCover = require("@/assets/frontCover.png");
+    const frontCoverOpt = {
+      floating: {
+        horizontalPosition: {
+          offset: 0,
+        },
+        verticalPosition: {
+          offset: 0,
+        },
+      },
+      width: 794,
+      // height: 1123,
+    };
+    const frontCoverData = await this.createImageRun(frontCover, frontCoverOpt);
+    const frontStyle = {
+      bold: true,
+      size: 32,
+      color: "000000",
+    };
+    const frontFrame = {
+      type: "absolute",
+      width: 4500,
+      height: 120,
+      anchor: {
+        horizontal: DOCX.FrameAnchorType.MARGIN,
+        vertical: DOCX.FrameAnchorType.MARGIN,
+      },
+      alignment: {
+        x: DOCX.HorizontalPositionAlign.CENTER,
+        y: DOCX.VerticalPositionAlign.BOTTOM,
+      },
+    };
+
+    // 封面
+    const frontPage = {
+      properties: {
+        page: {
+          margin: {
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+          },
+        },
+      },
+      headers: {
+        default: new DOCX.Header({
+          children: [
+            new DOCX.Paragraph({
+              children: [frontCoverData],
+            }),
+          ],
+        }),
+      },
+      children: [
+        // new DOCX.Paragraph({
+        //   children: [frontCoverData],
+        // }),
+        new DOCX.Paragraph({
+          frame: {
+            position: {
+              x: 4600,
+              y: 9400,
+            },
+            ...frontFrame,
+          },
+          children: [
+            new DOCX.TextRun({
+              text: "2023年度",
+              ...frontStyle,
+            }),
+          ],
+        }),
+        new DOCX.Paragraph({
+          frame: {
+            position: {
+              x: 4600,
+              y: 单位.length > wrapTextNum ? 10000 : 10400,
+            },
+            ...frontFrame,
+          },
+          ...frontStyle,
+          children: [
+            new DOCX.TextRun({
+              text: 单位,
+              ...frontStyle,
+            }),
+          ],
+        }),
+        new DOCX.Paragraph({
+          frame: {
+            position: {
+              x: 4600,
+              y: 党支部.length > wrapTextNum ? 11000 : 11400,
+            },
+            ...frontFrame,
+          },
+          ...frontStyle,
+          children: [
+            new DOCX.TextRun({
+              text: 党支部,
+              ...frontStyle,
+            }),
+          ],
+        }),
+      ],
+    };
+    const backCover = require("@/assets/backCover.png");
+    const backCoverOpt = {
+      floating: {
+        horizontalPosition: {
+          offset: 0,
+        },
+        verticalPosition: {
+          offset: 0,
+        },
+      },
+      width: 794,
+      // height: 1123,
+    };
+    const backCoverData = await this.createImageRun(backCover, backCoverOpt);
+
+    // 封底
+    const backPage = {
+      properties: {
+        page: {
+          margin: {
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+          },
+        },
+      },
+      children: [
+        new DOCX.Paragraph({
+          children: [backCoverData],
+        }),
+      ],
+    };
     for (let sec of pages) {
       const titleSec = this.createTitle(sec.title);
       const tableSec = await this.createTable(sec);
       const LANDSCAPE = {
         page: {
-          margin: {
-            size: {
-              orientation: DOCX.PageOrientation.LANDSCAPE,
-            },
+          size: {
+            orientation: DOCX.PageOrientation.LANDSCAPE,
           },
         },
       };
@@ -65,15 +206,15 @@ class DocumentCreator {
       const headers = {
         default: new DOCX.Header({
           children: [
-            new DOCX.Paragraph({
-              alignment: DOCX.AlignmentType.CENTER,
-              children: [
-                new DOCX.TextRun({
-                  text: sec.title,
-                  bold: true,
-                }),
-              ],
-            }),
+            //   new DOCX.Paragraph({
+            //     alignment: DOCX.AlignmentType.CENTER,
+            //     children: [
+            //       new DOCX.TextRun({
+            //         text: sec.title,
+            //         bold: true,
+            //       }),
+            //     ],
+            //   }),
           ],
         }),
       };
@@ -105,6 +246,10 @@ class DocumentCreator {
       };
       sections.push(docSec);
     }
+    // 添加封面和封底
+    sections.unshift(frontPage);
+    sections.push(backPage);
+
     const doc = new DOCX.Document({
       // 兼容性
       compatibility,
@@ -141,21 +286,27 @@ class DocumentCreator {
         rows[index] = [];
       }
       // 换行
-      if (
-        rows[index].length === form.colSpan ||
-        rows[index][0]?.colSpan === form.colSpan
-      ) {
+      const total = rows[index].reduce((acc, cur) => acc + cur.colSpan, 0);
+      if (total > form.colSpan) {
+        throw new Error("Invalid form item");
+      } else if (total === form.colSpan) {
         rows[++index] = [];
+      } else {
       }
+
       if ("label" in item) {
+        const [labelWidth, valueWidth] = item.widths;
         const label = {
           text: item.label,
           type: item.type,
+          colSpan: 1,
+          width: labelWidth,
         };
         const content = {
           text: data[item.prop],
           type: item.type,
-          colSpan: item.colSpan ?? 1,
+          colSpan: item.colSpan - 1,
+          width: valueWidth,
         };
         rows[index].push(label, content);
       } else if ("indent" in item) {
@@ -164,22 +315,27 @@ class DocumentCreator {
           text: data[item.prop],
           colSpan: form.colSpan,
           type: item.type,
+          width: 9010,
         });
       } else {
         throw new Error("Invalid form item");
       }
     }
+
     return { rows, ...form };
   }
   convertTable(table, data) {
     const tableHeader = table.data.map((item) => ({
       text: item.label,
       type: item.type ?? "text",
+      width: item.width,
     }));
     const tableRows = data.map((item) =>
       table.data.map((cell) => ({
         text: item[cell.prop],
         type: item.type ?? "text",
+        dict: item.dict,
+        width: cell.width,
       }))
     );
     return { rows: [tableHeader, ...tableRows], ...table };
@@ -211,7 +367,7 @@ class DocumentCreator {
         right: 100,
       },
       width: {
-        size: 9010,
+        size: template.title === "党费" ? 13970 : 9010,
         type: DOCX.WidthType.DXA,
       },
       indent: {
@@ -243,17 +399,22 @@ class DocumentCreator {
     });
   }
   // 生成图片
-  createImageRun(data, ratio, width = 572) {
+  createImageRun(data, opt = {}) {
     return new Promise((resolve, reject) => {
-      const testImg = require("@/assets/branchInfo.png");
-      convertImageToBase64(testImg, (imgData) => {
+      const imgUrl = data ?? require("@/assets/branchInfo.png");
+
+      convertImageToBase64(imgUrl, (imgData) => {
+        const width = opt.width ?? 572;
+        const ratio = opt.ratio ?? imgData.ratio ?? 1;
+        const height = opt.height ?? width / ratio;
         resolve(
           new DOCX.ImageRun({
             data: imgData.url,
             transformation: {
               width,
-              height: width / imgData.ratio,
+              height,
             },
+            ...opt,
           })
         );
       });
@@ -280,6 +441,8 @@ class DocumentCreator {
           paragraph.push(this.createTextRun(cell.text, opt));
         } else if (cell.type === "null") {
           paragraph.push(this.createTextRun(cell.text ?? ""));
+        } else if (cell.type === "dict") {
+          paragraph.push(this.createTextRun(dictsMap[cell.dict][cell.text]));
         }
 
         // 每个cell里套一层paragraph
@@ -308,6 +471,10 @@ class DocumentCreator {
             columnSpan: cell.colSpan ?? 1,
             verticalAlign: DOCX.VerticalAlign.CENTER,
             textDirection: DOCX.TextDirection.LEFT_TO_RIGHT_TOP_TO_BOTTOM,
+            width: {
+              size: cell.width,
+              type: DOCX.WidthType.DXA,
+            },
             // margins: {
             //   top: 140,
             //   bottom: 140,
@@ -419,19 +586,66 @@ class DocumentCreator {
     return docxElements;
   }
 
-  save(doc) {
-    DOCX.Packer.toBlob(doc)
-      .then((blob) => {
-        saveAs(blob, "2023党支部套打文档.docx");
-        renderAsync(blob, document.getElementById("bodyContainer"), null, {
-          inWrapper: false,
-          ignoreLastRenderedPageBreak: false,
-          experimental: true,
-          renderChanges: true,
-          debug: true,
-        });
-      })
-      .catch(console.error);
+  async save(doc) {
+    try {
+      const blob = await DOCX.Packer.toBlob(doc);
+      // await saveAs(blob, "2023党支部套打文档.docx");
+      await renderAsync(
+        blob,
+        document.getElementById("previewContainer"),
+        null,
+        {
+          renderChanges: false, //启用文档更改的实验渲染（插入/删除）
+          className: "docx-preview-document", //默认和文档样式类的类名/前缀
+          inWrapper: true, //启用围绕文档内容呈现包装器
+          ignoreWidth: false, //禁用页面的渲染宽度
+          ignoreHeight: false, //禁用页面的渲染高度
+          ignoreFonts: false, //禁用字体渲染
+          breakPages: true, //在分页符上启用分页
+          ignoreLastRenderedPageBreak: true, //在lastRenderedPageBreak元素上禁用分页
+          experimental: false, //启用实验功能（制表符停止计算）
+          trimXmlDeclaration: true, //如果为true，则在解析之前将从xml文档中删除xml声明
+          useBase64URL: false, //如果为true，图像、字体等将转换为base 64 URL，否则使用URL.createObjectURL
+          useMathMLPolyfill: false, //包括用于铬、边等的MathML多填充。
+          debug: false, //启用额外的日志记录
+        }
+      );
+      // 要插入的样式
+      const customStyle = `
+       .docx-preview-document-wrapper .docx-preview-document:first-child header{
+          margin-top: 0 !important;
+       }
+       .docx-preview-document-wrapper .docx-preview-document:first-child article p{
+          position: absolute !important;
+          width: 300px !important;
+       }
+       .docx-preview-document-wrapper .docx-preview-document:first-child article p span{
+          display: inline-block !important;
+       }
+       .docx-preview-document-wrapper .docx-preview-document:first-child article p:first-child{
+          top: 630px !important;
+          left: 310px !important;
+       }
+       .docx-preview-document-wrapper .docx-preview-document:first-child article p:nth-child(2){
+          top: ${单位.length > wrapTextNum ? 675 : 695}px !important;
+          left: 310px !important;
+      }
+      .docx-preview-document-wrapper .docx-preview-document:first-child article p:nth-child(3){
+          top: ${党支部.length > wrapTextNum ? 745 : 765}px !important;
+          left: 310px !important;
+      }
+      `;
+
+      // 创建一个 style 元素
+      const styleElement = document.createElement("style");
+      const target = document.getElementById("previewContainer");
+      // 插入样式内容
+      styleElement.appendChild(document.createTextNode(customStyle));
+      // 将样式插入到 head 元素中
+      target.appendChild(styleElement);
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
 
