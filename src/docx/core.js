@@ -7,11 +7,10 @@ import { saveAs } from "file-saver";
 import { cloneDeep } from "lodash";
 import { convertImageToBase64 } from "@/utils";
 import { dictsMap } from "@/utils/constants";
+import { createCover } from "./cover";
+import {wrapTextNum} from "@/utils/constants";
 // import { Buffer } from "buffer";
 // window.Buffer = Buffer;
-const 单位 = "明东公司工程技术部党总支-工程技术部综合设施组党支部";
-const 党支部 = "明东公司工程技术部党总支-工程技术部综合设施组党支部";
-const wrapTextNum = 14;
 const actives = [
   "branchInfo",
   // "committeeLeader",
@@ -32,6 +31,12 @@ const actives = [
   // "deliberation",
 ];
 class DocumentCreator {
+  constructor({ parentOrgName, name, year }) {
+    this.parentOrgName =
+      parentOrgName ?? "明东公司工程技术部党总支-工程技术部综合设施组党支部";
+    this.name = name ?? "明东公司工程技术部党总支-工程技术部综合设施组党支部";
+    this.year = year ?? new Date().getFullYear();
+  }
   async create() {
     const DATA = this.processingData(TEMP_DATA);
     const _pages = [];
@@ -52,146 +57,6 @@ class DocumentCreator {
     const pages = await Promise.all(_pages);
     const sections = [];
 
-    const frontCover = require("@/assets/frontCover.png");
-    const frontCoverOpt = {
-      floating: {
-        horizontalPosition: {
-          offset: 0,
-        },
-        verticalPosition: {
-          offset: 0,
-        },
-      },
-      width: 794,
-      // height: 1123,
-    };
-    const frontCoverData = await this.createImageRun(frontCover, frontCoverOpt);
-    const frontStyle = {
-      bold: true,
-      size: 32,
-      color: "000000",
-    };
-    const frontFrame = {
-      type: "absolute",
-      width: 4500,
-      height: 120,
-      anchor: {
-        horizontal: DOCX.FrameAnchorType.MARGIN,
-        vertical: DOCX.FrameAnchorType.MARGIN,
-      },
-      alignment: {
-        x: DOCX.HorizontalPositionAlign.CENTER,
-        y: DOCX.VerticalPositionAlign.BOTTOM,
-      },
-    };
-
-    // 封面
-    const frontPage = {
-      properties: {
-        page: {
-          margin: {
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-          },
-        },
-      },
-      headers: {
-        default: new DOCX.Header({
-          children: [
-            new DOCX.Paragraph({
-              children: [frontCoverData],
-            }),
-          ],
-        }),
-      },
-      children: [
-        // new DOCX.Paragraph({
-        //   children: [frontCoverData],
-        // }),
-        new DOCX.Paragraph({
-          frame: {
-            position: {
-              x: 4600,
-              y: 9400,
-            },
-            ...frontFrame,
-          },
-          children: [
-            new DOCX.TextRun({
-              text: "2023年度",
-              ...frontStyle,
-            }),
-          ],
-        }),
-        new DOCX.Paragraph({
-          frame: {
-            position: {
-              x: 4600,
-              y: 单位.length > wrapTextNum ? 10000 : 10400,
-            },
-            ...frontFrame,
-          },
-          ...frontStyle,
-          children: [
-            new DOCX.TextRun({
-              text: 单位,
-              ...frontStyle,
-            }),
-          ],
-        }),
-        new DOCX.Paragraph({
-          frame: {
-            position: {
-              x: 4600,
-              y: 党支部.length > wrapTextNum ? 11000 : 11400,
-            },
-            ...frontFrame,
-          },
-          ...frontStyle,
-          children: [
-            new DOCX.TextRun({
-              text: 党支部,
-              ...frontStyle,
-            }),
-          ],
-        }),
-      ],
-    };
-    const backCover = require("@/assets/backCover.png");
-    const backCoverOpt = {
-      floating: {
-        horizontalPosition: {
-          offset: 0,
-        },
-        verticalPosition: {
-          offset: 0,
-        },
-      },
-      width: 794,
-      // height: 1123,
-    };
-    const backCoverData = await this.createImageRun(backCover, backCoverOpt);
-
-    // 封底
-    const backPage = {
-      properties: {
-        page: {
-          margin: {
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-          },
-        },
-      },
-      children: [
-        new DOCX.Paragraph({
-          children: [backCoverData],
-        }),
-      ],
-    };
     for (let sec of pages) {
       const titleSec = this.createTitle(sec.title);
       const tableSec = await this.createTable(sec);
@@ -246,7 +111,14 @@ class DocumentCreator {
       };
       sections.push(docSec);
     }
+
     // 添加封面和封底
+    const { frontPage, backPage } = await createCover({
+      parentOrgName: this.parentOrgName,
+      name: this.name,
+      year: this.year,
+    });
+
     sections.unshift(frontPage);
     sections.push(backPage);
 
@@ -256,7 +128,7 @@ class DocumentCreator {
       styles,
       sections,
     });
-    this.save(doc);
+    return this.save(doc);
   }
   // 数据处理
   processingData(_data) {
@@ -586,32 +458,33 @@ class DocumentCreator {
     return docxElements;
   }
 
-  async save(doc) {
-    try {
-      const blob = await DOCX.Packer.toBlob(doc);
-      // await saveAs(blob, "2023党支部套打文档.docx");
-      await renderAsync(
-        blob,
-        document.getElementById("previewContainer"),
-        null,
-        {
-          renderChanges: false, //启用文档更改的实验渲染（插入/删除）
-          className: "docx-preview-document", //默认和文档样式类的类名/前缀
-          inWrapper: true, //启用围绕文档内容呈现包装器
-          ignoreWidth: false, //禁用页面的渲染宽度
-          ignoreHeight: false, //禁用页面的渲染高度
-          ignoreFonts: false, //禁用字体渲染
-          breakPages: true, //在分页符上启用分页
-          ignoreLastRenderedPageBreak: true, //在lastRenderedPageBreak元素上禁用分页
-          experimental: false, //启用实验功能（制表符停止计算）
-          trimXmlDeclaration: true, //如果为true，则在解析之前将从xml文档中删除xml声明
-          useBase64URL: false, //如果为true，图像、字体等将转换为base 64 URL，否则使用URL.createObjectURL
-          useMathMLPolyfill: false, //包括用于铬、边等的MathML多填充。
-          debug: false, //启用额外的日志记录
-        }
-      );
-      // 要插入的样式
-      const customStyle = `
+  save(doc) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const blob = await DOCX.Packer.toBlob(doc);
+        // await saveAs(blob, "2023党支部套打文档.docx");
+        await renderAsync(
+          blob,
+          document.getElementById("previewContainer"),
+          null,
+          {
+            renderChanges: false, //启用文档更改的实验渲染（插入/删除）
+            className: "docx-preview-document", //默认和文档样式类的类名/前缀
+            inWrapper: true, //启用围绕文档内容呈现包装器
+            ignoreWidth: false, //禁用页面的渲染宽度
+            ignoreHeight: false, //禁用页面的渲染高度
+            ignoreFonts: false, //禁用字体渲染
+            breakPages: true, //在分页符上启用分页
+            ignoreLastRenderedPageBreak: true, //在lastRenderedPageBreak元素上禁用分页
+            experimental: false, //启用实验功能（制表符停止计算）
+            trimXmlDeclaration: true, //如果为true，则在解析之前将从xml文档中删除xml声明
+            useBase64URL: false, //如果为true，图像、字体等将转换为base 64 URL，否则使用URL.createObjectURL
+            useMathMLPolyfill: false, //包括用于铬、边等的MathML多填充。
+            debug: false, //启用额外的日志记录
+          }
+        );
+        // 要插入的样式
+        const customStyle = `
        .docx-preview-document-wrapper .docx-preview-document:first-child header{
           margin-top: 0 !important;
        }
@@ -627,25 +500,30 @@ class DocumentCreator {
           left: 310px !important;
        }
        .docx-preview-document-wrapper .docx-preview-document:first-child article p:nth-child(2){
-          top: ${单位.length > wrapTextNum ? 675 : 695}px !important;
+          top: ${
+            this.parentOrgName.length > wrapTextNum ? 675 : 695
+          }px !important;
           left: 310px !important;
       }
       .docx-preview-document-wrapper .docx-preview-document:first-child article p:nth-child(3){
-          top: ${党支部.length > wrapTextNum ? 745 : 765}px !important;
+          top: ${this.name.length > wrapTextNum ? 745 : 765}px !important;
           left: 310px !important;
       }
       `;
 
-      // 创建一个 style 元素
-      const styleElement = document.createElement("style");
-      const target = document.getElementById("previewContainer");
-      // 插入样式内容
-      styleElement.appendChild(document.createTextNode(customStyle));
-      // 将样式插入到 head 元素中
-      target.appendChild(styleElement);
-    } catch (err) {
-      console.error(err);
-    }
+        // 创建一个 style 元素
+        const styleElement = document.createElement("style");
+        const target = document.getElementById("previewContainer");
+        // 插入样式内容
+        styleElement.appendChild(document.createTextNode(customStyle));
+        // 将样式插入到 head 元素中
+        target.appendChild(styleElement);
+        resolve(true);
+      } catch (err) {
+        console.error(err);
+        reject(err);
+      }
+    });
   }
 }
 

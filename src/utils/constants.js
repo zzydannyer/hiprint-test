@@ -2,6 +2,7 @@ const SIZE = {
   WIDTH: 794,
   HEIGHT: 1123,
 };
+export const wrapTextNum = 14;
 const theaderStyle = `
 font-size:13px;
 white-space:nowrap;

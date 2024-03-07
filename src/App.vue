@@ -108,19 +108,44 @@
       fullscreen
       center
     >
-      <div style="position: absolute; right: 20px; top: 50px">
+      <div
+        style="
+          position: absolute;
+          right: 20px;
+          top: 45px;
+          display: flex;
+          gap: 5px;
+          align-items: center;
+        "
+      >
+        {{ scaleValue }} 倍
+        <el-button
+          type="default"
+          size="mini"
+          icon="el-icon-minus"
+          circle
+          @click="handleScale(false)"
+        />
         <input
           type="range"
           min="0.5"
-          max="3"
+          max="1.5"
           step="0.1"
           v-model="scaleValue"
           @input="adjustPreviewContainerSize"
+        />
+        <el-button
+          type="default"
+          size="mini"
+          icon="el-icon-plus"
+          circle
+          @click="handleScale(true)"
         />
       </div>
       <div
         ref="scrollContainer"
         style="
+          position: relative;
           background: #808080;
           overflow: auto;
           width: 100%;
@@ -128,17 +153,16 @@
           border: 1px solid #aaa;
         "
       >
+        <div ref="spacer"></div>
         <div
-          id="previewContainer"
+          ref="previewContainer"
           :style="{
-            transform: `scale(${scaleValue})`,
+            transform: `scale(${scaleValue}) translateX(-50%)`,
+            transition: 'transform 0.3s ease',
             transformOrigin: 'top left',
           }"
-          style="position: relative; width: auto; height: auto"
-        ></div>
-        <div
-          ref="spacer"
-          style="visibility: hidden; width: 1px; height: 0"
+          style="position: absolute; top: 0; left: 50%"
+          id="previewContainer"
         ></div>
       </div>
     </el-dialog>
@@ -298,13 +322,24 @@ export default {
   },
   methods: {
     adjustPreviewContainerSize() {
-      const target = this.$refs.scrollContainer;
+      const target = this.$refs.previewContainer;
       const baseWidth = target.offsetWidth;
       const baseHeight = target.offsetHeight;
+      // console.log("🚀:", baseWidth, baseHeight);
       const scaledWidth = baseWidth * this.scaleValue;
       const scaledHeight = baseHeight * this.scaleValue;
+      // console.log("🚀:", scaledWidth, scaledHeight);
       this.$refs.spacer.style.width = `${scaledWidth}px`;
       this.$refs.spacer.style.height = `${scaledHeight}px`;
+    },
+    handleScale(isPlus) {
+      const delta = isPlus ? 0.1 : -0.1;
+      let newScaleValue = this.scaleValue * 1 + delta;
+      newScaleValue = Math.max(0.5, Math.min(1.5, newScaleValue));
+      if (newScaleValue !== this.scaleValue) {
+        this.scaleValue = Number(newScaleValue.toFixed(1));
+        this.adjustPreviewContainerSize();
+      }
     },
     async handlePrintDialog() {
       this.visible = true;
@@ -319,9 +354,10 @@ export default {
         mode: this.mode,
       });
     },
-    docxCore() {
-      const page = new DocumentCreator();
-      page.create();
+    async docxCore() {
+      const page = new DocumentCreator({});
+      await page.create();
+      this.adjustPreviewContainerSize();
     },
     HTML2DocxConfig(element) {
       let docxElements = [];
@@ -821,7 +857,7 @@ export default {
 .print-dialog.is-fullscreen {
   overflow: hidden !important;
   position: relative;
-  user-select: none;
+  /* user-select: none; */
 }
 /* #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
